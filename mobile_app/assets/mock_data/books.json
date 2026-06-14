@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "title": "Dasar-dasar Pemrograman Web Menggunakan Golang dan ReactJS",
+    "author": "Ahmad Fathoni R; Roni Andarsyah",
+    "category": "Teknologi",
+    "available": true
+  },
+  {
+    "id": 2,
+    "title": "Pengantar Sistem Informasi",
+    "author": "Lukman Abdurrahman; Ari Fajar Santoso",
+    "category": "Sistem Informasi",
+    "available": false
+  }
+]
