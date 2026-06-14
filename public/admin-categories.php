@@ -11,6 +11,7 @@ $categoryModel = new Category();
 
 $successMessage = '';
 $errorMessage = '';
+$editingCategory = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -49,6 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMessage = "Gagal menghapus kategori (mungkin masih digunakan pada buku).";
         }
     }
+}
+
+if (isset($_GET['edit'])) {
+    $editingCategory = $categoryModel->getById((int) $_GET['edit']);
 }
 
 // Get all categories with book count

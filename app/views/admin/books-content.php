@@ -21,43 +21,58 @@
 
 <section class="admin-panel" id="bookForm">
     <div class="admin-panel-heading">
-        <h2>Form Buku</h2>
-        <span>Tambah koleksi baru</span>
+        <h2><?= $editingBook ? 'Edit Buku' : 'Form Buku'; ?></h2>
+        <span><?= $editingBook ? 'Perbarui koleksi' : 'Tambah koleksi baru'; ?></span>
     </div>
     <form class="admin-form" method="POST" action="">
-        <input type="hidden" name="action" value="add">
+        <input type="hidden" name="action" value="<?= $editingBook ? 'edit' : 'add'; ?>">
+        <?php if ($editingBook): ?>
+            <input type="hidden" name="id" value="<?= e((string) $editingBook['id']); ?>">
+        <?php endif; ?>
         
         <label>
             <span>Judul Buku</span>
-            <input type="text" name="title" placeholder="Masukkan judul buku" required>
+            <input type="text" name="title" value="<?= e($editingBook['title'] ?? ''); ?>" placeholder="Masukkan judul buku" required>
         </label>
         
         <label>
             <span>Penulis</span>
-            <input type="text" name="author" placeholder="Nama penulis" required>
+            <input type="text" name="author" value="<?= e($editingBook['author'] ?? ''); ?>" placeholder="Nama penulis" required>
         </label>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <label>
                 <span>Penerbit</span>
-                <input type="text" name="publisher" placeholder="Nama penerbit">
+                <input type="text" name="publisher" value="<?= e($editingBook['publisher'] ?? ''); ?>" placeholder="Nama penerbit">
             </label>
             
             <label>
                 <span>Tahun Terbit</span>
-                <input type="number" name="publication_year" placeholder="YYYY">
+                <input type="number" name="publication_year" value="<?= e((string) ($editingBook['publication_year'] ?? '')); ?>" placeholder="YYYY">
             </label>
         </div>
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <label>
                 <span>ISBN</span>
-                <input type="text" name="isbn" placeholder="ISBN Buku">
+                <input type="text" name="isbn" value="<?= e($editingBook['isbn'] ?? ''); ?>" placeholder="ISBN Buku">
             </label>
             
             <label>
                 <span>Stok</span>
-                <input type="number" name="stock" value="1" min="1" required>
+                <input type="number" name="stock" value="<?= e((string) ($editingBook['stock'] ?? 1)); ?>" min="0" required>
+            </label>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <label>
+                <span>Kode Buku / QR</span>
+                <input type="text" name="book_code" value="<?= e($editingBook['book_code'] ?? ''); ?>" placeholder="TECH001">
+            </label>
+            
+            <label>
+                <span>Cover Image</span>
+                <input type="text" name="cover_image" value="<?= e($editingBook['cover_image'] ?? ''); ?>" placeholder="assets/images/books/cover.png">
             </label>
         </div>
         
@@ -66,17 +81,20 @@
             <select name="category_id" required>
                 <option value="">-- Pilih Kategori --</option>
                 <?php foreach ($categories as $cat): ?>
-                    <option value="<?= e($cat['id']) ?>"><?= e($cat['name']) ?></option>
+                    <option value="<?= e((string) $cat['id']) ?>" <?= (int) ($editingBook['category_id'] ?? 0) === (int) $cat['id'] ? 'selected' : ''; ?>><?= e($cat['name']) ?></option>
                 <?php endforeach; ?>
             </select>
         </label>
         
         <label>
             <span>Deskripsi Singkat</span>
-            <textarea name="description" rows="3" placeholder="Sinopsis atau deskripsi buku"></textarea>
+            <textarea name="description" rows="3" placeholder="Sinopsis atau deskripsi buku"><?= e($editingBook['description'] ?? ''); ?></textarea>
         </label>
         
-        <button class="btn btn-primary" type="submit">Simpan Buku</button>
+        <button class="btn btn-primary" type="submit"><?= $editingBook ? 'Update Buku' : 'Simpan Buku'; ?></button>
+        <?php if ($editingBook): ?>
+            <a class="btn btn-light" href="<?= page_url('admin-books.php'); ?>">Batal Edit</a>
+        <?php endif; ?>
     </form>
 </section>
 
@@ -102,7 +120,7 @@
                     <tr>
                         <td>
                             <div class="admin-book-cell">
-                                <img src="<?= media_url($book['cover_image'] ?? 'images/placeholder.png'); ?>" alt="Cover <?= e($book['title']); ?>" style="width:40px;height:60px;object-fit:cover;border-radius:4px;">
+                                <img src="<?= media_url($book['cover_image'] ?: 'images/logo.png'); ?>" alt="Cover <?= e($book['title']); ?>" style="width:40px;height:60px;object-fit:cover;border-radius:4px;">
                                 <strong><?= e($book['title']); ?></strong>
                             </div>
                         </td>
@@ -112,6 +130,7 @@
                         <td><?= e($book['stock']); ?> (<?= e($book['available_stock']); ?>)</td>
                         <td style="display:flex;gap:0.5rem;align-items:center;">
                             <a class="text-link" href="<?= page_url('book-detail.php?id=' . $book['id']); ?>">View</a>
+                            <a class="text-link" href="<?= page_url('admin-books.php?edit=' . $book['id'] . '#bookForm'); ?>">Edit</a>
                             
                             <form method="POST" style="display:inline;" onsubmit="return confirm('Hapus buku ini?');">
                                 <input type="hidden" name="action" value="delete">

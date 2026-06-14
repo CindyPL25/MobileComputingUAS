@@ -19,17 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'return') {
         $id = $_POST['id'] ?? 0;
         try {
-            // Cek data borrowing
-            $borrowing = $borrowingModel->getById($id);
-            if ($borrowing && $borrowing['status'] !== 'returned') {
-                $borrowingModel->update($id, [
-                    'status' => 'returned',
-                    'return_date' => date('Y-m-d')
-                ]);
-                $successMessage = "Buku berhasil dikembalikan. Stok otomatis bertambah.";
-            } else {
-                $errorMessage = "Data peminjaman tidak valid atau sudah dikembalikan.";
-            }
+            $borrowingModel->returnBorrowing($id, $_SESSION['user']['id'], 'Admin Website');
+            $successMessage = "Buku berhasil dikembalikan. Stok otomatis bertambah dan notifikasi tersimpan.";
         } catch (\Exception $e) {
             $errorMessage = "Gagal memproses pengembalian: " . $e->getMessage();
         }

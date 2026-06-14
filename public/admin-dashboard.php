@@ -9,22 +9,24 @@ requireAdmin();
 use App\Models\Book;
 use App\Models\User;
 use App\Models\Borrowing;
+use App\Models\QrLog;
 
 $bookModel = new Book();
 $userModel = new User();
 $borrowingModel = new Borrowing();
+$qrLogModel = new QrLog();
 
 // Get statistics
 $totalBooks = $bookModel->count();
 $totalUsers = $userModel->count();
 $activeBorrowings = $borrowingModel->getAllActiveBorrowings();
 $activeBorrowingsCount = count($activeBorrowings ?? []);
+$returnedBorrowings = array_filter($borrowingModel->getAllWithBooks(), fn ($item) => $item['status'] === 'returned');
+$qrScans = $qrLogModel->getRecentWithDetails(5);
+$qrScanCountToday = $qrLogModel->countToday();
 
 // Get latest borrowings (first 3)
 $recentBorrowings = array_slice($activeBorrowings ?? [], 0, 3);
-
-// Placeholder for QR scans (will be implemented later)
-$qrScans = [];
 
 $pageTitle = 'Dashboard Admin - Mobile E-Library Kampus';
 $bodyClass = 'admin-body';

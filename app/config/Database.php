@@ -10,22 +10,29 @@ namespace App\Config;
 
 use PDO;
 use PDOException;
+use RuntimeException;
+use Throwable;
 
 class Database {
     private static $instance = null;
     private $connection;
     
-    // Database configuration
-    private $host = 'localhost';
-    private $db_name = 'elibrary_mobile';
-    private $username = 'root';
-    private $password = '123';
-    private $charset = 'utf8mb4';
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
+    private $charset;
     
     /**
      * Private constructor - prevent direct instantiation
      */
     private function __construct() {
+        $this->host = getenv('DB_HOST') ?: 'localhost';
+        $this->db_name = getenv('DB_DATABASE') ?: 'elibrary_mobile';
+        $this->username = getenv('DB_USERNAME') ?: 'root';
+        $this->password = getenv('DB_PASSWORD') !== false ? getenv('DB_PASSWORD') : '123';
+        $this->charset = getenv('DB_CHARSET') ?: 'utf8mb4';
+
         try {
             $dsn = "mysql:host={$this->host};dbname={$this->db_name};charset={$this->charset}";
             
@@ -34,15 +41,21 @@ class Database {
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
-            
-            // Log successful connection
-            error_log("[" . date('Y-m-d H:i:s') . "] Database connected successfully\n", 3, __DIR__ . '/../../storage/logs/database.log');
+            $this->log('database.log', 'Database connected successfully');
             
         } catch (PDOException $e) {
-            // Log error
-            error_log("[" . date('Y-m-d H:i:s') . "] Database connection failed: " . $e->getMessage() . "\n", 3, __DIR__ . '/../../storage/logs/error.log');
-            die("Database Connection Failed: " . $e->getMessage());
+            $this->log('error.log', 'Database connection failed: ' . $e->getMessage());
+            throw new RuntimeException('Database connection failed.', 0, $e);
         }
+    }
+
+    private function log($file, $message) {
+        $logDir = __DIR__ . '/../../storage/logs';
+        if (!is_dir($logDir)) {
+            mkdir($logDir, 0775, true);
+        }
+
+        error_log("[" . date('Y-m-d H:i:s') . "] {$message}\n", 3, $logDir . '/' . $file);
     }
     
     /**
@@ -79,7 +92,7 @@ class Database {
             $stmt->execute($params);
             return $stmt->fetchAll();
         } catch (PDOException $e) {
-            error_log("[" . date('Y-m-d H:i:s') . "] Query error: " . $e->getMessage() . "\n", 3, __DIR__ . '/../../storage/logs/error.log');
+            $this->log('error.log', 'Query error: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -97,7 +110,7 @@ class Database {
             $stmt->execute($params);
             return $stmt->fetch();
         } catch (PDOException $e) {
-            error_log("[" . date('Y-m-d H:i:s') . "] Query error: " . $e->getMessage() . "\n", 3, __DIR__ . '/../../storage/logs/error.log');
+            $this->log('error.log', 'Query error: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -115,7 +128,7 @@ class Database {
             $stmt->execute($params);
             return $stmt->rowCount();
         } catch (PDOException $e) {
-            error_log("[" . date('Y-m-d H:i:s') . "] Execute error: " . $e->getMessage() . "\n", 3, __DIR__ . '/../../storage/logs/error.log');
+            $this->log('error.log', 'Execute error: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -160,7 +173,7 @@ class Database {
             $db = self::getInstance();
             $db->queryOne("SELECT 1");
             return true;
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return false;
         }
     }

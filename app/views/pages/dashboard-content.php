@@ -1,12 +1,12 @@
 <?php
 $borrowedCount = count(array_filter($borrowings, fn ($item) => strtolower($item['status']) === 'active'));
-$returnedCount = count(array_filter($borrowings, fn ($item) => strtolower($item['status']) === 'returned'));
+$returnedCount = count(array_filter($returnedBorrowings ?? [], fn ($item) => strtolower($item['status']) === 'returned'));
 $popularBooks = array_values(array_filter($books, fn ($book) => $book['is_popular'] == 1));
 $stats = [
     ['label' => 'Total Buku', 'value' => count($books), 'icon' => 'TB', 'tone' => 'tone-blue'],
     ['label' => 'Buku Dipinjam', 'value' => $borrowedCount, 'icon' => 'BD', 'tone' => 'tone-gold'],
     ['label' => 'Buku Dikembalikan', 'value' => $returnedCount, 'icon' => 'BK', 'tone' => 'tone-green'],
-    ['label' => 'QR Scan', 'value' => '18', 'icon' => 'QR', 'tone' => 'tone-slate'],
+    ['label' => 'QR Scan Hari Ini', 'value' => $qrScanCount ?? 0, 'icon' => 'QR', 'tone' => 'tone-slate'],
 ];
 ?>
 <main class="page-shell">

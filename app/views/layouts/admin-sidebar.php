@@ -6,8 +6,8 @@
 
     <div class="admin-sidebar-card">
         <span>Hari ini</span>
-        <strong>18 Scan QR</strong>
-        <p>3 peminjaman sedang diproses</p>
+        <strong><?= e((string) ($qrScanCountToday ?? 0)); ?> Scan QR</strong>
+        <p><?= e((string) ($activeBorrowingsCount ?? 0)); ?> peminjaman sedang diproses</p>
     </div>
 
     <nav class="admin-menu" aria-label="Menu admin">

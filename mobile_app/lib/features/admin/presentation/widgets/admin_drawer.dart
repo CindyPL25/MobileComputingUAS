@@ -7,9 +7,25 @@ Widget buildAdminDrawer(BuildContext context) {
     child: ListView(
       padding: EdgeInsets.zero,
       children: [
-        const DrawerHeader(
-          decoration: BoxDecoration(color: AppTheme.navy),
-          child: Text('Menu Admin', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
+        DrawerHeader(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(colors: [AppTheme.navy, AppTheme.navySoft]),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(color: AppTheme.gold, borderRadius: BorderRadius.circular(8)),
+                child: const Icon(Icons.local_library, color: AppTheme.navy),
+              ),
+              const Spacer(),
+              const Text('Menu Admin', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 4),
+              const Text('Mobile E-Library Kampus', style: TextStyle(color: Colors.white70, fontSize: 12)),
+            ],
+          ),
         ),
         ListTile(
           leading: const Icon(Icons.dashboard),

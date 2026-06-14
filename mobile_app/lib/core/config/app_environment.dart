@@ -1,20 +1,22 @@
-enum DataSourceMode { mock, api }
-
 class AppEnvironment {
-  AppEnvironment({required this.dataSourceMode, required this.apiBaseUrl});
+  const AppEnvironment({required this.apiBaseUrl});
 
-  final DataSourceMode dataSourceMode;
   final String apiBaseUrl;
 
+  String get assetBaseUrl {
+    final uri = Uri.parse(apiBaseUrl);
+    return '${uri.scheme}://${uri.authority}';
+  }
+
+  String assetUrl(String path) => '$assetBaseUrl/assets/${path.replaceFirst(RegExp(r'^/+'), '')}';
+
   factory AppEnvironment.fromDartDefine() {
-    const rawMode = String.fromEnvironment('APP_DATA_SOURCE', defaultValue: 'mock');
     const rawBaseUrl = String.fromEnvironment(
       'API_BASE_URL',
-      defaultValue: 'http://10.0.2.2/mobilecomputinguas-api',
+      defaultValue: 'http://127.0.0.1:8089/api/',
     );
 
-    final mode = rawMode.toLowerCase() == 'api' ? DataSourceMode.api : DataSourceMode.mock;
-
-    return AppEnvironment(dataSourceMode: mode, apiBaseUrl: rawBaseUrl);
+    final normalizedBaseUrl = rawBaseUrl.endsWith('/') ? rawBaseUrl : '$rawBaseUrl/';
+    return AppEnvironment(apiBaseUrl: normalizedBaseUrl);
   }
 }

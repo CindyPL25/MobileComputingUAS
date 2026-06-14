@@ -9,7 +9,7 @@ class NetworkClient {
             baseUrl: baseUrl,
             connectTimeout: const Duration(milliseconds: AppConstants.connectionTimeoutMs),
             receiveTimeout: const Duration(milliseconds: AppConstants.receiveTimeoutMs),
-            headers: {'Accept': 'application/json'},
+            headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
           ),
         );
 

@@ -12,16 +12,16 @@ if (isAdmin()) {
 
 // Handle login attempt
 $error = '';
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['email']) && isset($_GET['password'])) {
-    $email = $_GET['email'];
-    $password = $_GET['password'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
     
     $userModel = new User();
     
     // Find user by email
     $user = $userModel->getByEmail($email);
     
-    if ($user && $user['role'] === 'admin' && password_verify($password, $user['password'])) {
+    if ($user && $user['role'] === 'admin' && $user['status'] === 'aktif' && password_verify($password, $user['password'])) {
         // Authentication successful
         $_SESSION['user'] = $user;
         header('Location: ' . page_url('admin-dashboard.php'));
@@ -43,11 +43,11 @@ require_once __DIR__ . '/../app/views/layouts/header.php';
     <section class="auth-card admin-login-card">
         <span class="eyebrow">Panel pengelola</span>
         <h1>Masuk sebagai admin</h1>
-        <p class="auth-note">Gunakan tampilan ini untuk simulasi akses petugas perpustakaan.</p>
+        <p class="auth-note">Gunakan akun admin aktif yang tersimpan di database.</p>
         <?php if ($error): ?>
             <div class="alert alert-danger"><?= e($error); ?></div>
         <?php endif; ?>
-        <form class="form-stack" action="<?= page_url('admin-login.php'); ?>" method="get">
+        <form class="form-stack" action="<?= page_url('admin-login.php'); ?>" method="post">
             <label>
                 <span>Email Admin</span>
                 <input type="email" name="email" placeholder="admin@kampus.ac.id" required>

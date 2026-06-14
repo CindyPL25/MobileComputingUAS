@@ -75,7 +75,7 @@ CREATE TABLE books (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Dibuat pada',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Diupdate pada',
     
-    CONSTRAINT fk_books_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
+    CONSTRAINT fk_books_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT,
     
     INDEX idx_category_id (category_id),
     INDEX idx_book_code (book_code),
@@ -100,7 +100,7 @@ CREATE TABLE borrowings (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Dibuat pada',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Diupdate pada',
     
-    CONSTRAINT fk_borrowings_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_borrowings_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
     
     INDEX idx_user_id (user_id),
     INDEX idx_status (status),
@@ -120,7 +120,7 @@ CREATE TABLE borrowing_details (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Dibuat pada',
     
     CONSTRAINT fk_borrowing_details_borrowing FOREIGN KEY (borrowing_id) REFERENCES borrowings(id) ON DELETE CASCADE,
-    CONSTRAINT fk_borrowing_details_book FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE CASCADE,
+    CONSTRAINT fk_borrowing_details_book FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE RESTRICT,
     
     INDEX idx_borrowing_id (borrowing_id),
     INDEX idx_book_id (book_id),
@@ -170,17 +170,54 @@ CREATE TABLE notifications (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tabel notifikasi pengguna';
 
 -- =====================================================
--- TRIGGER: Update available_stock saat insert borrowing_details
+-- TABLE: api_tokens
+-- Menyimpan token autentikasi API mobile/web client
+-- =====================================================
+CREATE TABLE api_tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID token API',
+    user_id INT NOT NULL COMMENT 'Referensi user pemilik token',
+    token VARCHAR(128) NOT NULL COMMENT 'Token bearer API',
+    expires_at DATETIME NULL COMMENT 'Waktu kedaluwarsa token',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Dibuat pada',
+
+    CONSTRAINT fk_api_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+
+    UNIQUE KEY unique_api_token (token),
+    INDEX idx_user_id (user_id),
+    INDEX idx_expires_at (expires_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tabel token API';
+
+-- =====================================================
+-- TRIGGER: Update available_stock saat insert borrowing_details aktif
 -- =====================================================
 DELIMITER $$
 
 CREATE TRIGGER tr_decrease_stock_on_borrow
-AFTER INSERT ON borrowing_details
+BEFORE INSERT ON borrowing_details
 FOR EACH ROW
 BEGIN
-    UPDATE books 
-    SET available_stock = available_stock - 1
-    WHERE id = NEW.book_id;
+    DECLARE borrowing_status VARCHAR(20);
+    DECLARE current_available_stock INT;
+
+    SELECT status INTO borrowing_status
+    FROM borrowings
+    WHERE id = NEW.borrowing_id;
+
+    IF borrowing_status IN ('pending', 'active', 'overdue') THEN
+        SELECT available_stock INTO current_available_stock
+        FROM books
+        WHERE id = NEW.book_id
+        FOR UPDATE;
+
+        IF current_available_stock <= 0 THEN
+            SIGNAL SQLSTATE '45000'
+                SET MESSAGE_TEXT = 'Available stock is not enough for borrowing';
+        END IF;
+
+        UPDATE books 
+        SET available_stock = available_stock - 1
+        WHERE id = NEW.book_id;
+    END IF;
 END$$
 
 DELIMITER ;
@@ -196,15 +233,10 @@ FOR EACH ROW
 BEGIN
     -- Trigger fires only when status changes TO 'returned'
     IF NEW.status = 'returned' AND OLD.status <> 'returned' THEN
-        -- Restore available_stock for all books in this borrowing transaction
-        UPDATE books
-        SET available_stock = available_stock + 
-            (SELECT COUNT(*) FROM borrowing_details 
-             WHERE borrowing_id = NEW.id)
-        WHERE id IN (
-            SELECT DISTINCT book_id FROM borrowing_details 
-            WHERE borrowing_id = NEW.id
-        );
+        UPDATE books b
+        JOIN borrowing_details bd ON bd.book_id = b.id
+        SET b.available_stock = LEAST(b.stock, b.available_stock + 1)
+        WHERE bd.borrowing_id = NEW.id;
     END IF;
 END$$
 
@@ -216,14 +248,14 @@ DELIMITER ;
 -- CONSTRAINTS & CHECKS
 -- =====================================================
 
--- Cek: available_stock tidak boleh > stock
-ALTER TABLE books ADD CONSTRAINT chk_available_stock CHECK (available_stock <= stock AND available_stock >= 0);
+-- Cek: stok tidak boleh negatif dan available_stock tidak boleh > stock
+ALTER TABLE books ADD CONSTRAINT chk_available_stock CHECK (stock >= 0 AND available_stock <= stock AND available_stock >= 0);
 
 -- Cek: due_date harus >= borrow_date
 ALTER TABLE borrowings ADD CONSTRAINT chk_dates CHECK (due_date >= borrow_date);
 
 -- =====================================================
--- SAMPLE QUERIES FOR BUSINESS LOGIC
+-- REFERENCE QUERIES FOR BUSINESS LOGIC
 -- =====================================================
 
 /*

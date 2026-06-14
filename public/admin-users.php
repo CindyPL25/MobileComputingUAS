@@ -12,6 +12,7 @@ $userModel = new User();
 
 $successMessage = '';
 $errorMessage = '';
+$editingUser = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -52,7 +53,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (\Exception $e) {
             $errorMessage = "Gagal menghapus mahasiswa (mungkin masih ada riwayat pinjam).";
         }
+    } elseif ($action === 'edit') {
+        $id = (int) ($_POST['id'] ?? 0);
+        $nim = trim($_POST['nim'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+
+        try {
+            $currentUser = $userModel->getById($id);
+            if (!$currentUser || $currentUser['role'] !== 'mahasiswa') {
+                throw new \RuntimeException('Mahasiswa tidak ditemukan.');
+            }
+
+            $existingNim = $userModel->findBy('nim', $nim);
+            $existingEmail = $userModel->findBy('email', $email);
+            if ($existingNim && (int) $existingNim['id'] !== $id) {
+                throw new \RuntimeException('NIM sudah digunakan.');
+            }
+            if ($existingEmail && (int) $existingEmail['id'] !== $id) {
+                throw new \RuntimeException('Email sudah digunakan.');
+            }
+
+            $data = [
+                'nim' => $nim,
+                'name' => trim($_POST['name'] ?? ''),
+                'email' => $email,
+                'major' => trim($_POST['major'] ?? ''),
+                'status' => $_POST['status'] ?? 'aktif'
+            ];
+
+            if (!empty($_POST['password'])) {
+                $data['password'] = password_hash($_POST['password'], PASSWORD_BCRYPT);
+            }
+
+            $userModel->update($id, $data);
+            $successMessage = "Mahasiswa berhasil diperbarui.";
+        } catch (\Exception $e) {
+            $errorMessage = "Gagal memperbarui mahasiswa: " . $e->getMessage();
+        }
     }
+}
+
+if (isset($_GET['edit'])) {
+    $editingUser = $userModel->getById((int) $_GET['edit']);
 }
 
 // Get all mahasiswa users

@@ -15,6 +15,7 @@ import '../../features/catalog/presentation/catalog_screen.dart';
 import '../../features/history/presentation/history_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/home/presentation/landing_screen.dart';
+import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/qr/presentation/qr_scanner_screen.dart';
 import '../../shared/presentation/main_wrapper.dart';
@@ -89,7 +90,7 @@ final goRouter = GoRouter(
         ),
         GoRoute(
           path: '/qr',
-          builder: (context, state) => const QrScannerScreen(),
+          builder: (context, state) => QrScannerScreen(initialBookCode: state.uri.queryParameters['code']),
         ),
         GoRoute(
           path: '/history',
@@ -98,6 +99,10 @@ final goRouter = GoRouter(
         GoRoute(
           path: '/profile',
           builder: (context, state) => const ProfileScreen(),
+        ),
+        GoRoute(
+          path: '/notifications',
+          builder: (context, state) => const NotificationsScreen(),
         ),
       ],
     ),

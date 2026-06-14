@@ -4,7 +4,7 @@
         <div class="hero-content">
             <span class="eyebrow">Perpustakaan digital kampus</span>
             <h1>Mobile E-Library Kampus</h1>
-            <p>Sistem perpustakaan mobile web untuk mencari katalog buku, melihat detail koleksi, dan melakukan simulasi scan QR Code buku dengan cepat.</p>
+            <p>Sistem perpustakaan mobile web untuk mencari katalog buku, melihat detail koleksi, dan memproses QR Code buku langsung ke database.</p>
             <div class="hero-actions">
                 <a class="btn btn-primary" href="<?= page_url('dashboard.php'); ?>">Mulai Baca</a>
                 <a class="btn btn-light" href="<?= page_url('catalog.php'); ?>">Lihat Katalog</a>
@@ -19,9 +19,9 @@
             <h2>Perpustakaan kampus yang lebih dekat dengan mahasiswa</h2>
             <p>Mobile E-Library Kampus membantu mahasiswa mencari referensi kuliah, melihat status ketersediaan buku, dan membuka detail koleksi melalui QR Code. Tampilan dibuat sederhana agar nyaman digunakan dari smartphone saat berada di ruang baca, kelas, atau area kampus.</p>
             <div class="library-highlights">
-                <span>6 Buku dummy</span>
-                <span>4 Riwayat pinjam</span>
-                <span>QR siap simulasi</span>
+                <span><?= e((string) ($totalBooks ?? 0)); ?> Buku</span>
+                <span><?= e((string) ($activeBorrowingsCount ?? 0)); ?> Peminjaman aktif</span>
+                <span><?= e((string) ($qrScanCountToday ?? 0)); ?> Scan QR hari ini</span>
             </div>
         </div>
         <div class="intro-image">
@@ -53,7 +53,7 @@
                     <span class="feature-icon" aria-hidden="true">QR</span>
                 </div>
                 <h3>Scan QR Code Buku</h3>
-                <p>Simulasi scan QR untuk membuka informasi buku tanpa mengetik kode koleksi secara manual.</p>
+                <p>Validasi kode QR untuk membuka informasi buku dan memproses peminjaman atau pengembalian.</p>
                 <a href="<?= page_url('scan-qr.php'); ?>">Coba scan</a>
             </article>
             <article class="feature-card feature-history">
@@ -118,7 +118,7 @@
                     <span>3</span>
                     <div>
                         <h3>Scan QR Code</h3>
-                        <p>Simulasikan scan QR pada buku untuk membuka informasi koleksi secara cepat dari perangkat mobile.</p>
+                        <p>Masukkan kode QR pada buku untuk validasi koleksi, peminjaman, atau pengembalian.</p>
                     </div>
                 </article>
             </div>
@@ -127,9 +127,9 @@
 
     <section class="section home-cta">
         <div>
-            <span class="eyebrow">Siap dipresentasikan</span>
-            <h2>Prototype frontend untuk UAS Mobile Computing</h2>
-            <p>Struktur halaman sudah rapi dan siap dikembangkan menjadi aplikasi lengkap dengan database, autentikasi, dan fitur peminjaman asli.</p>
+            <span class="eyebrow">Layanan aktif</span>
+            <h2>Backend perpustakaan terhubung ke MySQL</h2>
+            <p>Autentikasi, katalog, peminjaman, pengembalian, notifikasi, dan log QR diproses melalui backend PHP Native.</p>
         </div>
         <a class="btn btn-primary" href="<?= page_url('scan-qr.php'); ?>">Coba Scan QR</a>
     </section>

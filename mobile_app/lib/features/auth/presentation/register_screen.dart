@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/theme/app_theme.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -28,36 +29,22 @@ class RegisterScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('BUAT AKUN BARU', style: TextStyle(color: AppTheme.gold, fontWeight: FontWeight.bold, fontSize: 12)),
+                const Text('AKUN BARU', style: TextStyle(color: AppTheme.gold, fontWeight: FontWeight.bold, fontSize: 12)),
                 const SizedBox(height: 8),
-                const Text('Daftar e-library', style: TextStyle(color: AppTheme.navy, fontWeight: FontWeight.w900, fontSize: 24)),
-                const SizedBox(height: 24),
-                const Text('Nama Lengkap', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                const SizedBox(height: 8),
-                const TextField(decoration: InputDecoration(hintText: 'Masukkan nama')),
-                const SizedBox(height: 16),
-                const Text('NIM', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                const SizedBox(height: 8),
-                const TextField(decoration: InputDecoration(hintText: 'Masukkan NIM')),
-                const SizedBox(height: 16),
-                const Text('Password', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                const SizedBox(height: 8),
-                const TextField(obscureText: true, decoration: InputDecoration(hintText: 'Buat password')),
+                const Text('Registrasi mahasiswa', style: TextStyle(color: AppTheme.navy, fontWeight: FontWeight.w900, fontSize: 24)),
+                const SizedBox(height: 12),
+                const Text(
+                  'Endpoint registrasi tidak tersedia pada API mobile saat ini. Buat akun melalui website PHP Native atau minta admin menambahkan mahasiswa.',
+                  style: TextStyle(color: AppTheme.muted),
+                ),
                 const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => context.pop(),
-                    child: const Text('Daftar'),
+                    child: const Text('Kembali ke Login'),
                   ),
                 ),
-                const SizedBox(height: 16),
-                Center(
-                  child: TextButton(
-                    onPressed: () => context.pop(),
-                    child: const Text('Sudah punya akun? Login', style: TextStyle(color: AppTheme.navy)),
-                  ),
-                )
               ],
             ),
           ),

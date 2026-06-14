@@ -1,8 +1,8 @@
 <?php
 
-function e(string $value): string
+function e($value): string
 {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
 function asset_url(string $path): string
@@ -10,8 +10,10 @@ function asset_url(string $path): string
     return '../assets/' . ltrim($path, '/');
 }
 
-function media_url(string $path): string
+function media_url($path): string
 {
+    $path = (string) ($path ?: 'images/logo.png');
+
     if (preg_match('/^https?:\/\//', $path)) {
         return $path;
     }

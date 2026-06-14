@@ -4,8 +4,10 @@ require_once __DIR__ . '/../app/helpers/functions.php';
 
 // Load book detail from database
 use App\Models\Book;
+use App\Models\Borrowing;
 
 $bookModel = new Book();
+$borrowingModel = new Borrowing();
 $bookId = isset($_GET['id']) ? (int) $_GET['id'] : (isset($_POST['id']) ? (int) $_POST['id'] : 1);
 $book = $bookModel->getBookDetail($bookId);
 
@@ -27,19 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $errorMessage = "Maaf, stok buku ini sedang kosong.";
     } else {
         try {
-            $db = \App\Config\Database::getInstance();
             $userId = $_SESSION['user']['id'];
-            $borrowDate = date('Y-m-d');
-            $dueDate = date('Y-m-d', strtotime('+7 days'));
-            
-            // Insert header
-            $db->execute("INSERT INTO borrowings (user_id, borrow_date, due_date, status) VALUES (?, ?, ?, 'active')", [$userId, $borrowDate, $dueDate]);
-            $borrowingId = $db->lastInsertId();
-            
-            // Insert detail (Trigger will automatically decrease available_stock!)
-            $db->execute("INSERT INTO borrowing_details (borrowing_id, book_id) VALUES (?, ?)", [$borrowingId, $bookId]);
-            
-            $successMessage = "Buku berhasil dipinjam! Harap kembalikan sebelum " . date('d M Y', strtotime($dueDate));
+            $borrowing = $borrowingModel->createBorrowing($userId, $bookId);
+            $successMessage = "Buku berhasil dipinjam! Harap kembalikan sebelum " . date('d M Y', strtotime($borrowing['due_date']));
             
             // Reload book data to reflect stock changes
             $book = $bookModel->getBookDetail($bookId);
@@ -51,8 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // Determine book status based on availability
 $book['status'] = $book['available_stock'] > 0 ? 'Tersedia' : 'Dipinjam';
-$book['source_url'] = '#'; // Placeholder for source URL
-
 $pageTitle = $book['title'] . ' - Mobile E-Library Kampus';
 require_once __DIR__ . '/../app/views/layouts/header.php';
 require_once __DIR__ . '/../app/views/layouts/navbar.php';
@@ -99,11 +89,14 @@ require_once __DIR__ . '/../app/views/layouts/navbar.php';
                     <dd><span class="status-pill <?= status_class($book['status']); ?>"><?= e($book['status']); ?></span></dd>
                 </div>
                 <div>
-                    <dt>Sumber Data</dt>
-                    <dd><a class="text-link" href="<?= e($book['source_url']); ?>" target="_blank" rel="noopener">Lihat sumber</a></dd>
+                    <dt>Kode Buku / QR</dt>
+                    <dd><?= e($book['book_code']); ?></dd>
                 </div>
             </dl>
-            <?php include __DIR__ . '/../app/views/components/qr-placeholder.php'; ?>
+            <div class="qr-box">
+                <strong><?= e($book['book_code']); ?></strong>
+                <span>Kode ini dipakai backend untuk validasi QR buku.</span>
+            </div>
             
             <div class="detail-actions" style="display:flex; gap:10px;">
                 <?php if ($book['available_stock'] > 0): ?>

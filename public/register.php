@@ -13,11 +13,19 @@ if (isLoggedIn()) {
 // Handle registration attempt
 $error = '';
 $success = '';
-if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['name']) && isset($_GET['nim']) && isset($_GET['email']) && isset($_GET['password'])) {
-    $name = $_GET['name'];
-    $nim = $_GET['nim'];
-    $email = $_GET['email'];
-    $password = $_GET['password'];
+$old = [
+    'name' => '',
+    'nim' => '',
+    'email' => '',
+    'major' => '',
+];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name'] ?? '');
+    $nim = trim($_POST['nim'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $major = trim($_POST['major'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $old = compact('name', 'nim', 'email', 'major');
     
     $userModel = new User();
     
@@ -35,13 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['name']) && isset($_GET[
             'email' => $email,
             'password' => $hashedPassword,
             'role' => 'mahasiswa',
-            'status' => 'active'
+            'major' => $major,
+            'status' => 'aktif'
         ]);
         
         if ($newUserId) {
             $success = 'Registrasi berhasil! Silakan login dengan akun baru Anda.';
-            // Clear form
-            $_GET = [];
+            $old = ['name' => '', 'nim' => '', 'email' => '', 'major' => ''];
         } else {
             $error = 'Gagal membuat akun. Silakan coba lagi.';
         }
@@ -66,18 +74,22 @@ require_once __DIR__ . '/../app/views/layouts/header.php';
         <?php if ($success): ?>
             <div class="alert alert-success"><?= e($success); ?></div>
         <?php endif; ?>
-        <form class="form-stack" action="<?= page_url('register.php'); ?>" method="get">
+        <form class="form-stack" action="<?= page_url('register.php'); ?>" method="post">
             <label>
                 <span>Nama Lengkap</span>
-                <input type="text" name="name" placeholder="Nama lengkap" value="<?= e($_GET['name'] ?? ''); ?>" required>
+                <input type="text" name="name" placeholder="Nama lengkap" value="<?= e($old['name']); ?>" required>
             </label>
             <label>
                 <span>NIM</span>
-                <input type="text" name="nim" placeholder="2304010101" value="<?= e($_GET['nim'] ?? ''); ?>" required>
+                <input type="text" name="nim" placeholder="2304010101" value="<?= e($old['nim']); ?>" required>
             </label>
             <label>
                 <span>Email</span>
-                <input type="email" name="email" placeholder="nama@student.ac.id" value="<?= e($_GET['email'] ?? ''); ?>" required>
+                <input type="email" name="email" placeholder="nama@student.ac.id" value="<?= e($old['email']); ?>" required>
+            </label>
+            <label>
+                <span>Program Studi</span>
+                <input type="text" name="major" placeholder="Teknik Informatika" value="<?= e($old['major']); ?>">
             </label>
             <label>
                 <span>Password</span>

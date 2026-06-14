@@ -4,13 +4,13 @@ class AppTheme {
   // Colors from CSS
   static const Color navy = Color(0xFF0c2f59);
   static const Color navySoft = Color(0xFF163f70);
-  static const Color cream = Color(0xFFf5eedd);
-  static const Color creamStrong = Color(0xFFead7b5);
+  static const Color cream = Color(0xFFf3f6fb);
+  static const Color creamStrong = Color(0xFFe6edf7);
   static const Color gold = Color(0xFFc79d49);
   static const Color ink = Color(0xFF172033);
   static const Color muted = Color(0xFF6d7480);
-  static const Color surface = Color(0xFFfffdf8);
-  static const Color line = Color(0xFFe5ddcd);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color line = Color(0xFFdce5f0);
   static const Color green = Color(0xFF257a58);
   static const Color red = Color(0xFFa33d3d);
 
@@ -74,6 +74,19 @@ class AppTheme {
           borderSide: const BorderSide(color: navy),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      ),
+      cardTheme: CardThemeData(
+        color: surface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: line)),
+      ),
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: surface,
+        selectedItemColor: navy,
+        unselectedItemColor: muted,
+        type: BottomNavigationBarType.fixed,
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 11),
+        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w700, fontSize: 11),
       ),
     );
   }

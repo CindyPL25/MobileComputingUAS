@@ -1,18 +1,18 @@
 <?php
-$borrowedCount = count(array_filter($histories, fn ($item) => $item['status'] === 'Dipinjam'));
-$returnedCount = count(array_filter($histories, fn ($item) => $item['status'] === 'Dikembalikan'));
+$borrowedCount = $activeBorrowingsCount ?? count(array_filter($histories, fn ($item) => in_array($item['status'], ['active', 'pending', 'overdue'], true)));
+$returnedCount = count($returnedBorrowings ?? []);
 $adminStats = [
     ['label' => 'Total Buku', 'value' => count($books), 'hint' => 'Koleksi aktif'],
     ['label' => 'Mahasiswa', 'value' => count($users), 'hint' => 'Akun terdaftar'],
     ['label' => 'Dipinjam', 'value' => $borrowedCount, 'hint' => 'Masih berjalan'],
-    ['label' => 'QR Scan', 'value' => count($qrScans), 'hint' => 'Log terbaru'],
+    ['label' => 'QR Scan', 'value' => $qrScanCountToday ?? count($qrScans), 'hint' => 'Hari ini'],
 ];
 ?>
 <section class="admin-hero-panel">
     <div>
         <span class="eyebrow">Panel admin</span>
         <h1>Kelola katalog dan peminjaman dari satu tempat</h1>
-        <p>Dashboard ini masih frontend dummy, tetapi struktur dan tampilannya sudah disiapkan untuk nanti dihubungkan ke database MySQL.</p>
+        <p>Dashboard ini membaca koleksi, mahasiswa, peminjaman, dan log QR langsung dari database MySQL.</p>
     </div>
     <div class="admin-hero-actions">
         <a class="btn btn-primary" href="<?= page_url('admin-books.php'); ?>">Tambah Buku</a>
@@ -20,9 +20,9 @@ $adminStats = [
     </div>
     <div class="admin-hero-meter" aria-label="Ringkasan aktivitas">
         <span>Aktivitas sistem</span>
-        <strong>82%</strong>
+        <strong><?= e((string) (($totalBooks ?? count($books)) > 0 ? 100 : 0)); ?>%</strong>
         <div><i></i></div>
-        <p>Katalog dan scan QR berjalan normal</p>
+        <p>Katalog dan log QR tersinkron dengan database</p>
     </div>
 </section>
 
@@ -47,7 +47,7 @@ $adminStats = [
                 <div class="admin-list-item">
                     <div>
                         <strong><?= e($item['book_titles'] ?? 'N/A'); ?></strong>
-                        <span><?= e(isset($item['borrow_date']) ? formatDate($item['borrow_date']) : 'N/A'); ?> - <?= e(isset($item['return_date']) ? formatDate($item['return_date']) : '-'); ?></span>
+                        <span><?= e(isset($item['borrow_date']) ? formatDate($item['borrow_date']) : 'N/A'); ?> - <?= e(!empty($item['return_date']) ? formatDate($item['return_date']) : '-'); ?></span>
                     </div>
                     <em><?= e($item['status']); ?></em>
                 </div>
@@ -64,10 +64,10 @@ $adminStats = [
             <?php foreach ($qrScans as $scan): ?>
                 <div class="admin-list-item">
                     <div>
-                        <strong><?= e($scan['book']); ?></strong>
-                        <span><?= e($scan['student']); ?> · <?= e($scan['time']); ?></span>
+                        <strong><?= e($scan['book_title']); ?></strong>
+                        <span><?= e($scan['user_name']); ?> - <?= e(formatDate($scan['created_at'])); ?></span>
                     </div>
-                    <em><?= e($scan['result']); ?></em>
+                    <em><?= e($scan['scan_type']); ?></em>
                 </div>
             <?php endforeach; ?>
         </div>

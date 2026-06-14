@@ -8,15 +8,19 @@ requireLogin();
 // Load from database
 use App\Models\Book;
 use App\Models\Borrowing;
+use App\Models\QrLog;
 
 $bookModel = new Book();
 $borrowingModel = new Borrowing();
+$qrLogModel = new QrLog();
 
 // Get popular books
 $books = $bookModel->getPopularBooks();
 
 // Get user's active borrowings
 $borrowings = $borrowingModel->getActiveBorrowingsByUser($_SESSION['user']['id']);
+$returnedBorrowings = $borrowingModel->getBorrowingsByUser($_SESSION['user']['id']);
+$qrScanCount = $qrLogModel->countToday();
 
 // Get user data for display
 $user = $_SESSION['user'];

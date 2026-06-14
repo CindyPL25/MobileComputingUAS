@@ -5,8 +5,15 @@ require_once __DIR__ . '/../app/helpers/functions.php';
 // Check if user is admin
 requireAdmin();
 
-// Placeholder for QR scans data (will be implemented later)
-$qrScans = [];
+use App\Models\QrLog;
+use App\Models\Book;
+
+$qrLogModel = new QrLog();
+$bookModel = new Book();
+
+$qrScans = $qrLogModel->getRecentWithDetails(30);
+$books = $bookModel->getAllWithCategory();
+$qrScanCountToday = $qrLogModel->countToday();
 
 $pageTitle = 'QR Scan Admin - Mobile E-Library Kampus';
 $bodyClass = 'admin-body';

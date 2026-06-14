@@ -1,90 +1,88 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/providers/api_providers.dart';
+import '../../../shared/widgets/library_chrome.dart';
 import 'widgets/admin_drawer.dart';
 
-class AdminProfileScreen extends StatelessWidget {
+class AdminProfileScreen extends ConsumerWidget {
   const AdminProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileState = ref.watch(profileProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profil Admin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
       ),
       drawer: buildAdminDrawer(context),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.line),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: 70,
-                    height: 70,
-                    decoration: const BoxDecoration(
-                      color: AppTheme.navy,
-                      shape: BoxShape.circle,
+      body: profileState.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(child: Text(error.toString(), style: const TextStyle(color: AppTheme.red))),
+        data: (user) => SingleChildScrollView(
+          child: LibraryContent(
+            maxWidth: 980,
+            child: Column(
+              children: [
+                LibraryResponsiveGrid(
+                  minTileWidth: 360,
+                  children: [
+                    LibrarySurfaceCard(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: const BoxDecoration(color: AppTheme.navy, shape: BoxShape.circle),
+                            alignment: Alignment.center,
+                            child: Text(user.initials, style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold)),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(user.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppTheme.navy)),
+                          Text(user.role, style: const TextStyle(color: AppTheme.muted)),
+                        ],
+                      ),
                     ),
-                    alignment: Alignment.center,
-                    child: const Text('SA', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text('Siti Nurhaliza', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppTheme.navy)),
-                  const Text('Admin Utama Perpustakaan', style: TextStyle(color: AppTheme.muted)),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {},
-                    child: const Text('Edit Profil'),
-                  )
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.line),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Informasi akun', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.navy)),
-                  const SizedBox(height: 16),
-                  _buildProfileRow('Nama Lengkap', 'Siti Nurhaliza'),
-                  const Divider(color: AppTheme.line),
-                  _buildProfileRow('Email', 'siti.nurhaliza@kampus.ac.id'),
-                  const Divider(color: AppTheme.line),
-                  _buildProfileRow('Role', 'Admin Utama'),
-                  const Divider(color: AppTheme.line),
-                  _buildProfileRow('Terdaftar', '01 Januari 2025'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () => context.go('/landing'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.red,
-                  side: const BorderSide(color: AppTheme.red),
+                    LibrarySurfaceCard(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Informasi akun', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.navy)),
+                          const SizedBox(height: 16),
+                          _buildProfileRow('Nama Lengkap', user.name),
+                          const Divider(color: AppTheme.line),
+                          _buildProfileRow('Email', user.email),
+                          const Divider(color: AppTheme.line),
+                          _buildProfileRow('Role', user.role),
+                          const Divider(color: AppTheme.line),
+                          _buildProfileRow('Status', user.status),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                child: const Text('Logout'),
-              ),
-            )
-          ],
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: () async {
+                      await ref.read(authControllerProvider.notifier).logout();
+                      if (context.mounted) context.go('/landing');
+                    },
+                    style: OutlinedButton.styleFrom(foregroundColor: AppTheme.red, side: const BorderSide(color: AppTheme.red)),
+                    child: const Text('Logout'),
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -98,7 +96,7 @@ class AdminProfileScreen extends StatelessWidget {
         children: [
           Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.muted, fontSize: 12)),
           const SizedBox(height: 4),
-          Text(value, style: const TextStyle(color: AppTheme.ink, fontWeight: FontWeight.w600)),
+          Text(value.isEmpty ? '-' : value, style: const TextStyle(color: AppTheme.ink, fontWeight: FontWeight.w600)),
         ],
       ),
     );

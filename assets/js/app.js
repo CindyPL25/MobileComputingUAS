@@ -62,22 +62,3 @@ if (searchInput && categoryFilter) {
   searchInput.addEventListener('input', filterCatalog);
   categoryFilter.addEventListener('change', filterCatalog);
 }
-
-const startScanButton = document.querySelector('[data-start-scan]');
-const scanResult = document.querySelector('[data-scan-result]');
-const scanLine = document.querySelector('[data-scan-line]');
-
-if (startScanButton && scanResult) {
-  startScanButton.addEventListener('click', () => {
-    startScanButton.disabled = true;
-    startScanButton.textContent = 'Memindai...';
-    scanLine?.classList.add('is-scanning');
-
-    window.setTimeout(() => {
-      scanResult.hidden = false;
-      startScanButton.disabled = false;
-      startScanButton.textContent = 'Scan Ulang';
-      scanLine?.classList.remove('is-scanning');
-    }, 900);
-  });
-}

@@ -2,7 +2,7 @@
     <button class="admin-toggle" type="button" data-admin-toggle aria-label="Buka menu admin">Menu</button>
     <div>
         <strong><?= e($adminTitle ?? 'Dashboard Admin'); ?></strong>
-        <span>Frontend panel pengelola perpustakaan</span>
+        <span>Panel pengelola perpustakaan</span>
     </div>
     <label class="admin-search" for="adminSearch">
         <span>Cari</span>

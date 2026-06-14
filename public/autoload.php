@@ -20,8 +20,15 @@ spl_autoload_register(function($class) {
     }
 });
 
-// Start session
-session_start();
+// Start session using a writable project-local directory.
+if (session_status() === PHP_SESSION_NONE) {
+    $sessionDir = __DIR__ . '/../storage/sessions';
+    if (!is_dir($sessionDir)) {
+        mkdir($sessionDir, 0775, true);
+    }
+    session_save_path($sessionDir);
+    session_start();
+}
 
 // Get the currently logged-in user
 function getCurrentUser() {

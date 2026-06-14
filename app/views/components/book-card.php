@@ -1,6 +1,6 @@
 <article class="book-card" data-book-card data-title="<?= e(strtolower($book['title'])); ?>" data-author="<?= e(strtolower($book['author'])); ?>" data-category="<?= e($book['category_name'] ?? $book['category'] ?? '-'); ?>">
     <div class="book-cover">
-        <img src="<?= media_url($book['cover_image'] ?? 'images/placeholder.png'); ?>" alt="Cover <?= e($book['title']); ?>" loading="lazy">
+        <img src="<?= media_url($book['cover_image'] ?: 'images/logo.png'); ?>" alt="Cover <?= e($book['title']); ?>" loading="lazy">
     </div>
     <div class="book-info">
         <span class="category-pill"><?= e($book['category_name'] ?? $book['category'] ?? '-'); ?></span>
