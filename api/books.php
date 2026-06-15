@@ -12,8 +12,7 @@ api_guard(function() {
     $bookModel = new Book();
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        // Require token even for books list
-        require_auth();
+        // Public access allowed for books list
 
         $books = $bookModel->getRecentWithCategory(100);
         send_json(true, "Books retrieved successfully", $books);

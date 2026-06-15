@@ -18,98 +18,76 @@ class HomeScreen extends ConsumerWidget {
     final history = ref.watch(borrowingsProvider);
 
     return Scaffold(
-      body: Column(
-        children: [
-          LibraryBrandBar(
-            trailing: IconButton(
-              onPressed: () => context.push('/notifications'),
-              icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          ref
+            ..invalidate(profileProvider)
+            ..invalidate(dashboardProvider)
+            ..invalidate(booksProvider)
+            ..invalidate(borrowingsProvider)
+            ..invalidate(notificationsProvider);
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: dashboard.when(
+            loading: () => const _LoadingBlock(),
+            error: (error, _) => Padding(
+              padding: const EdgeInsets.all(16),
+              child: _ErrorBlock(message: error.toString()),
             ),
-            onLogout: () async {
-              await ref.read(authControllerProvider.notifier).logout();
-              ref
-                ..invalidate(profileProvider)
-                ..invalidate(dashboardProvider)
-                ..invalidate(booksProvider)
-                ..invalidate(borrowingsProvider)
-                ..invalidate(notificationsProvider);
-              if (context.mounted) context.go('/landing');
-            },
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: () async {
-                ref
-                  ..invalidate(profileProvider)
-                  ..invalidate(dashboardProvider)
-                  ..invalidate(booksProvider)
-                  ..invalidate(borrowingsProvider)
-                  ..invalidate(notificationsProvider);
-              },
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: dashboard.when(
-                  loading: () => const _LoadingBlock(),
-                  error: (error, _) => Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: _ErrorBlock(message: error.toString()),
-                  ),
-                  data: (stats) {
-                    final user = profile.valueOrNull;
-                    final bookList = books.valueOrNull ?? <BookModel>[];
-                    final histories = history.valueOrNull ?? <HistoryModel>[];
-                    final returnedCount = histories.where((item) => item.status == 'Dikembalikan').length;
-                    final popularBooks = bookList.where((book) => book.popular).take(3).toList();
-                    final recommendedBooks = popularBooks.isEmpty ? bookList.take(3).toList() : popularBooks;
+            data: (stats) {
+              final user = profile.valueOrNull;
+              final bookList = books.valueOrNull ?? <BookModel>[];
+              final histories = history.valueOrNull ?? <HistoryModel>[];
+              final returnedCount = histories.where((item) => item.status == 'Dikembalikan').length;
+              final popularBooks = bookList.where((book) => book.popular).take(3).toList();
+              final recommendedBooks = popularBooks.isEmpty ? bookList.take(3).toList() : popularBooks;
 
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  LibraryHeroPanel(
+                    compact: true,
+                    eyebrow: 'Dashboard Mahasiswa',
+                    title: 'Halo, ${user?.name ?? 'Pengguna'}',
+                    subtitle: 'Temukan buku kuliah, pantau peminjaman, dan scan QR buku langsung dari perangkat mobile.',
+                    imagePath: 'images/home-reading-area.png',
+                    actions: [
+                      ElevatedButton(onPressed: () => context.go('/catalog'), child: const Text('Buka Katalog')),
+                      OutlinedButton(onPressed: () => context.go('/qr'), child: const Text('Scan QR')),
+                    ],
+                  ),
+                  LibraryContent(
+                    child: Column(
                       children: [
-                        LibraryHeroPanel(
-                          compact: true,
-                          eyebrow: 'Dashboard Mahasiswa',
-                          title: 'Halo, ${user?.name ?? 'Pengguna'}',
-                          subtitle: 'Temukan buku kuliah, pantau peminjaman, dan scan QR buku langsung dari perangkat mobile.',
-                          imagePath: 'images/home-reading-area.png',
-                          actions: [
-                            ElevatedButton(onPressed: () => context.go('/catalog'), child: const Text('Buka Katalog')),
-                            OutlinedButton(onPressed: () => context.go('/qr'), child: const Text('Scan QR')),
+                        LibraryResponsiveGrid(
+                          minTileWidth: 210,
+                          children: [
+                            LibraryStatCard(label: 'Total Buku', value: stats.totalBooks.toString(), icon: Icons.library_books, color: AppTheme.navy),
+                            LibraryStatCard(label: 'Dipinjam', value: stats.totalActiveBorrowings.toString(), icon: Icons.book_online, color: AppTheme.gold),
+                            LibraryStatCard(label: 'Dikembalikan', value: returnedCount.toString(), icon: Icons.check_circle_outline, color: AppTheme.green),
+                            LibraryStatCard(label: 'Kategori', value: stats.totalCategories.toString(), icon: Icons.category_outlined, color: AppTheme.muted),
                           ],
                         ),
-                        LibraryContent(
-                          child: Column(
-                            children: [
-                              LibraryResponsiveGrid(
-                                minTileWidth: 210,
-                                children: [
-                                  LibraryStatCard(label: 'Total Buku', value: stats.totalBooks.toString(), icon: Icons.library_books, color: AppTheme.navy),
-                                  LibraryStatCard(label: 'Dipinjam', value: stats.totalActiveBorrowings.toString(), icon: Icons.book_online, color: AppTheme.gold),
-                                  LibraryStatCard(label: 'Dikembalikan', value: returnedCount.toString(), icon: Icons.check_circle_outline, color: AppTheme.green),
-                                  LibraryStatCard(label: 'Kategori', value: stats.totalCategories.toString(), icon: Icons.category_outlined, color: AppTheme.muted),
-                                ],
-                              ),
-                              const SizedBox(height: 24),
-                              LibrarySectionHeader(
-                                eyebrow: 'Rekomendasi',
-                                title: 'Buku dari database',
-                                action: TextButton(onPressed: () => context.go('/catalog'), child: const Text('Lihat semua')),
-                              ),
-                              const SizedBox(height: 12),
-                              LibraryResponsiveGrid(
-                                minTileWidth: 320,
-                                children: recommendedBooks.map((book) => _buildBookCard(context, book)).toList(),
-                              ),
-                            ],
-                          ),
-                        )
+                        const SizedBox(height: 24),
+                        LibrarySectionHeader(
+                          eyebrow: 'Rekomendasi',
+                          title: 'Buku dari database',
+                          action: TextButton(onPressed: () => context.go('/catalog'), child: const Text('Lihat semua')),
+                        ),
+                        const SizedBox(height: 12),
+                        LibraryResponsiveGrid(
+                          minTileWidth: 320,
+                          children: recommendedBooks.map((book) => _buildBookCard(context, book)).toList(),
+                        ),
                       ],
-                    );
-                  },
-                ),
-              ),
-            ),
+                    ),
+                  )
+                ],
+              );
+            },
           ),
-        ],
+        ),
       ),
     );
   }

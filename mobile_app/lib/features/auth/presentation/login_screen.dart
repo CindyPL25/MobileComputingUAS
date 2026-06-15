@@ -90,7 +90,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextField(
                           controller: _identityController,
                           keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(hintText: 'nama@student.ac.id / 2201001'),
+                          decoration: const InputDecoration(hintText: 'nama@student.ac.id'),
                         ),
                         const SizedBox(height: 16),
                         const Text('Password', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),

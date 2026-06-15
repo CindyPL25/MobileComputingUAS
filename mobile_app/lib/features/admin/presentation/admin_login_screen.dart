@@ -84,7 +84,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                         const SizedBox(height: 24),
                         const Text('Email Admin', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                         const SizedBox(height: 8),
-                        TextField(controller: _emailController, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(hintText: 'admin@kampus.ac.id')),
+                        TextField(controller: _emailController, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(hintText: 'nama@admin.ac.id')),
                         const SizedBox(height: 16),
                         const Text('Password', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                         const SizedBox(height: 8),

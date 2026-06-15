@@ -67,7 +67,7 @@ class LandingScreen extends ConsumerWidget {
                           );
                           final image = ClipRRect(
                             borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
+                            child: Image.asset(
                               LibraryChrome.asset(context, 'images/home-library-service.png'),
                               fit: BoxFit.cover,
                               height: isWide ? 300 : 190,

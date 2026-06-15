@@ -51,6 +51,10 @@ final adminUsersProvider = FutureProvider<List<UserModel>>((ref) {
   return ref.watch(apiRepositoryProvider).fetchAdminUsers();
 });
 
+final adminBorrowingsProvider = FutureProvider<List<AdminBorrowingModel>>((ref) {
+  return ref.watch(apiRepositoryProvider).fetchAdminBorrowings();
+});
+
 final borrowingsProvider = FutureProvider<List<HistoryModel>>((ref) {
   return ref.watch(apiRepositoryProvider).fetchBorrowings();
 });
@@ -149,7 +153,7 @@ class ApiRepository {
   }
 
   Future<List<BookModel>> fetchBooks() async {
-    final response = await _dio.get<Map<String, dynamic>>('books.php', options: await _authOptions());
+    final response = await _dio.get<Map<String, dynamic>>('books.php');
     return _unwrapList(response).map(BookModel.fromJson).toList();
   }
 
@@ -219,6 +223,11 @@ class ApiRepository {
   Future<List<UserModel>> fetchAdminUsers() async {
     final response = await _dio.get<Map<String, dynamic>>('admin-users.php', options: await _authOptions());
     return _unwrapList(response).map(UserModel.fromJson).toList();
+  }
+
+  Future<List<AdminBorrowingModel>> fetchAdminBorrowings() async {
+    final response = await _dio.get<Map<String, dynamic>>('admin-borrowings.php', options: await _authOptions());
+    return _unwrapList(response).map(AdminBorrowingModel.fromJson).toList();
   }
 
   Future<void> updateUser(Map<String, dynamic> data) async {

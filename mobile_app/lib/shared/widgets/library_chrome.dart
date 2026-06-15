@@ -9,7 +9,13 @@ import '../providers/api_providers.dart';
 class LibraryChrome {
   const LibraryChrome._();
 
+  /// Returns the Flutter bundle asset path for a given image path like 'images/hero-library.png'
   static String asset(BuildContext context, String path) {
+    return 'assets/${path.replaceFirst(RegExp(r'^/+'), '')}';
+  }
+
+  /// Returns the full server URL for a given path (used for API-served images like book covers)
+  static String serverUrl(BuildContext context, String path) {
     return AppEnvironment.fromDartDefine().assetUrl(path);
   }
 }
@@ -227,6 +233,108 @@ class LibraryAdminBar extends StatelessWidget {
   }
 }
 
+class LibraryMahasiswaBar extends StatelessWidget {
+  const LibraryMahasiswaBar({
+    super.key,
+    this.onLogout,
+  });
+
+  final VoidCallback? onLogout;
+
+  @override
+  Widget build(BuildContext context) {
+    final navItems = [
+      ('Home', '/home'),
+      ('Katalog', '/catalog'),
+      ('Scan QR', '/qr'),
+      ('Riwayat', '/history'),
+      ('Profil', '/profile'),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useStackedNav = constraints.maxWidth < 620;
+        final nav = SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: navItems.map((item) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: _NavPill(label: item.$1, onTap: () => context.go(item.$2)),
+              );
+            }).toList(),
+          ),
+        );
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppTheme.navy.withValues(alpha: 0.96),
+            border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.08))),
+          ),
+          child: SafeArea(
+            bottom: false,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1180),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(color: AppTheme.gold, borderRadius: BorderRadius.circular(8)),
+                          child: const Icon(Icons.local_library, color: AppTheme.navy, size: 19),
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Mobile E-Library', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16), overflow: TextOverflow.ellipsis),
+                              SizedBox(height: 1),
+                              Text('Portal mahasiswa', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 11), overflow: TextOverflow.ellipsis),
+                            ],
+                          ),
+                        ),
+                        if (!useStackedNav)
+                          Flexible(
+                            flex: 3,
+                            child: Align(alignment: Alignment.centerRight, child: nav),
+                          ),
+                        IconButton(
+                          tooltip: 'Notifikasi',
+                          onPressed: () => context.push('/notifications'),
+                          icon: const Icon(Icons.notifications_outlined, color: Colors.white),
+                        ),
+                        if (onLogout != null) ...[
+                          IconButton(
+                            tooltip: 'Logout',
+                            onPressed: onLogout,
+                            icon: const Icon(Icons.logout, color: Colors.white),
+                          ),
+                        ],
+                      ],
+                    ),
+                    if (useStackedNav) ...[
+                      const SizedBox(height: 10),
+                      SizedBox(width: double.infinity, child: nav),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+
 class LibraryAdminPage extends ConsumerWidget {
   const LibraryAdminPage({
     super.key,
@@ -286,7 +394,7 @@ class LibraryHeroPanel extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppTheme.navy,
             image: DecorationImage(
-              image: NetworkImage(LibraryChrome.asset(context, imagePath)),
+              image: AssetImage(LibraryChrome.asset(context, imagePath)),
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(AppTheme.navy.withValues(alpha: 0.56), BlendMode.srcOver),
             ),

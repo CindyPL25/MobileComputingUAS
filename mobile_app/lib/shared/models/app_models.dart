@@ -159,6 +159,51 @@ class HistoryModel {
   }
 }
 
+/// Model untuk tampilan peminjaman di sisi admin (semua user)
+class AdminBorrowingModel {
+  final int id;
+  final String userName;
+  final String userNim;
+  final String bookTitles;
+  final int bookCount;
+  final String borrowDate;
+  final String dueDate;
+  final String returnDate;
+  final String status;
+  final double fineAmount;
+  final String notes;
+
+  const AdminBorrowingModel({
+    required this.id,
+    required this.userName,
+    required this.userNim,
+    required this.bookTitles,
+    required this.bookCount,
+    required this.borrowDate,
+    required this.dueDate,
+    required this.returnDate,
+    required this.status,
+    required this.fineAmount,
+    required this.notes,
+  });
+
+  factory AdminBorrowingModel.fromJson(Map<String, dynamic> json) {
+    return AdminBorrowingModel(
+      id: _asInt(json['id']),
+      userName: _asString(json['user_name'] ?? json['name']),
+      userNim: _asString(json['user_nim'] ?? json['nim']),
+      bookTitles: _asString(json['book_titles']),
+      bookCount: _asInt(json['book_count']),
+      borrowDate: _asString(json['borrow_date']),
+      dueDate: _asString(json['due_date']),
+      returnDate: _asString(json['return_date']),
+      status: _statusLabel(_asString(json['status'])),
+      fineAmount: (json['fine_amount'] as num?)?.toDouble() ?? 0.0,
+      notes: _asString(json['notes']),
+    );
+  }
+}
+
 class NotificationModel {
   final int id;
   final String title;

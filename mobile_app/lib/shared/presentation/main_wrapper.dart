@@ -26,16 +26,6 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
     }
   }
 
-  void _onMahasiswaItemTapped(int index) {
-    switch (index) {
-      case 0: context.go('/home'); break;
-      case 1: context.go('/catalog'); break;
-      case 2: context.go('/qr'); break;
-      case 3: context.go('/history'); break;
-      case 4: context.go('/profile'); break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final path = GoRouterState.of(context).uri.path;
@@ -131,70 +121,25 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
       );
     }
 
-    // Mahasiswa layout
-    final mahasiswaDestinations = const [
-      _NavDestination(Icons.home_outlined, Icons.home, 'Home'),
-      _NavDestination(Icons.search_outlined, Icons.search, 'Katalog'),
-      _NavDestination(Icons.qr_code_scanner_outlined, Icons.qr_code_scanner, 'Scan'),
-      _NavDestination(Icons.history_outlined, Icons.history, 'Riwayat'),
-      _NavDestination(Icons.person_outline, Icons.person, 'Profil'),
-    ];
-
-    final mahasiswaCurrentIndex = switch (path) {
-      '/catalog' => 1,
-      '/qr' => 2,
-      '/history' => 3,
-      '/profile' => 4,
-      _ => 0,
-    };
-
-    if (isWide) {
-      return Scaffold(
-        body: Row(
-          children: [
-            NavigationRail(
-              backgroundColor: AppTheme.navy,
-              selectedIndex: mahasiswaCurrentIndex,
-              onDestinationSelected: _onMahasiswaItemTapped,
-              extended: true,
-              minExtendedWidth: 206,
-              leading: const Padding(
-                padding: EdgeInsets.fromLTRB(12, 16, 12, 28),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _RailLogo(),
-                    SizedBox(width: 10),
-                    Text('Menu Mahasiswa', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
-                  ],
-                ),
-              ),
-              selectedIconTheme: const IconThemeData(color: AppTheme.gold),
-              unselectedIconTheme: IconThemeData(color: Colors.white.withValues(alpha: 0.72)),
-              selectedLabelTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
-              unselectedLabelTextStyle: TextStyle(color: Colors.white.withValues(alpha: 0.74), fontWeight: FontWeight.w700),
-              destinations: mahasiswaDestinations.map((item) => NavigationRailDestination(
-                icon: Icon(item.icon),
-                selectedIcon: Icon(item.activeIcon),
-                label: Text(item.label),
-              )).toList(),
-            ),
-            Expanded(child: widget.child),
-          ],
-        ),
-      );
-    }
-
+    // Mahasiswa layout — top navbar (sama seperti admin)
     return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: mahasiswaCurrentIndex,
-        onTap: _onMahasiswaItemTapped,
-        items: mahasiswaDestinations.map((item) => BottomNavigationBarItem(
-          icon: Icon(item.icon),
-          activeIcon: Icon(item.activeIcon),
-          label: item.label,
-        )).toList(),
+      backgroundColor: AppTheme.cream,
+      body: Column(
+        children: [
+          LibraryMahasiswaBar(
+            onLogout: () async {
+              await ref.read(authControllerProvider.notifier).logout();
+              ref
+                ..invalidate(profileProvider)
+                ..invalidate(dashboardProvider)
+                ..invalidate(booksProvider)
+                ..invalidate(borrowingsProvider)
+                ..invalidate(notificationsProvider);
+              if (context.mounted) context.go('/landing');
+            },
+          ),
+          Expanded(child: widget.child),
+        ],
       ),
     );
   }
