@@ -103,6 +103,18 @@ class _AdminBooksScreenState extends ConsumerState<AdminBooksScreen> {
                       onSave: _saveBook,
                     ),
                     const SizedBox(height: 16),
+                    _BookForm(
+                      formKey: _formKey,
+                      titleController: _titleController,
+                      authorController: _authorController,
+                      categoryController: _categoryController,
+                      bookCodeController: _bookCodeController,
+                      stockController: _stockController,
+                      coverController: _coverController,
+                      isSaving: _isSaving,
+                      onSave: _saveBook,
+                    ),
+                    const SizedBox(height: 16),
                     Text('${books.length} koleksi', style: const TextStyle(color: AppTheme.muted, fontSize: 12)),
                     const SizedBox(height: 12),
                     if (books.isEmpty)
@@ -215,9 +227,11 @@ class _BookForm extends StatelessWidget {
 }
 
 class _BookTile extends StatelessWidget {
-  const _BookTile(this.book);
+  const _BookTile({required this.book, required this.onEdit, required this.onDelete});
 
   final BookModel book;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -252,6 +266,21 @@ class _BookTile extends StatelessWidget {
                 Text('${book.publisher} (${book.year})', style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
                 const SizedBox(height: 4),
                 Text('Kode: ${book.bookCode} - Stok ${book.availableStock}/${book.stock}', style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    TextButton.icon(
+                      onPressed: onEdit,
+                      icon: const Icon(Icons.edit, size: 16),
+                      label: const Text('Edit', style: TextStyle(fontSize: 12)),
+                    ),
+                    TextButton.icon(
+                      onPressed: onDelete,
+                      icon: const Icon(Icons.delete, size: 16, color: AppTheme.red),
+                      label: const Text('Hapus', style: TextStyle(fontSize: 12, color: AppTheme.red)),
+                    ),
+                  ],
+                )
               ],
             ),
           )

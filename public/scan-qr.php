@@ -70,10 +70,28 @@ require_once __DIR__ . '/../app/views/layouts/navbar.php';
     <section class="scan-layout">
         <article class="scan-panel">
             <h2>Proses kode QR</h2>
-            <form class="form-stack" method="post" action="<?= page_url('scan-qr.php'); ?>">
+            
+            <!-- Area Kamera -->
+            <div id="qr-reader-container" style="display:none; margin-bottom: 1rem; border-radius: 8px; overflow: hidden; border: 2px solid #e2e8f0;">
+                <div id="qr-reader" style="width: 100%;"></div>
+            </div>
+            
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
+                <button type="button" id="btn-start-scan" class="btn btn-primary" style="flex: 1; padding: 0.6rem; font-size: 0.9rem; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                    Buka Kamera
+                </button>
+                <button type="button" id="btn-stop-scan" style="display:none; flex: 1; padding: 0.6rem; font-size: 0.9rem; background-color: #e53e3e; border: 1px solid #e53e3e; color: white; border-radius: 6px; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;">
+                    Tutup Kamera
+                </button>
+            </div>
+            
+            <div id="scan-feedback" style="display:none; margin-bottom: 1rem; padding: 0.75rem; border-radius: 6px; font-size: 0.9rem; font-weight: 500;"></div>
+
+            <form class="form-stack" id="qr-form" method="post" action="<?= page_url('scan-qr.php'); ?>">
                 <label>
                     <span>Kode Buku / QR</span>
-                    <input type="text" name="book_code" value="<?= e($bookCode); ?>" placeholder="TECH001" required>
+                    <input type="text" id="book_code_input" name="book_code" value="<?= e($bookCode); ?>" placeholder="TECH001" required>
                 </label>
                 <label>
                     <span>Aksi</span>
@@ -103,6 +121,86 @@ require_once __DIR__ . '/../app/views/layouts/navbar.php';
             <?php endif; ?>
         </article>
     </section>
+
+    <!-- Script HTML5 QR Code -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const btnStart = document.getElementById('btn-start-scan');
+        const btnStop = document.getElementById('btn-stop-scan');
+        const readerContainer = document.getElementById('qr-reader-container');
+        const bookCodeInput = document.getElementById('book_code_input');
+        const feedback = document.getElementById('scan-feedback');
+        
+        let html5QrCode;
+
+        function showFeedback(msg, isSuccess) {
+            feedback.style.display = 'block';
+            feedback.style.backgroundColor = isSuccess ? '#d4edda' : '#f8d7da';
+            feedback.style.color = isSuccess ? '#155724' : '#721c24';
+            feedback.innerHTML = msg;
+            
+            setTimeout(() => {
+                feedback.style.display = 'none';
+            }, 5000);
+        }
+
+        btnStart.addEventListener('click', function() {
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("qr-reader");
+            }
+            
+            readerContainer.style.display = 'block';
+            btnStart.style.display = 'none';
+            btnStop.style.display = 'flex';
+            
+            html5QrCode.start(
+                { facingMode: "environment" }, // Prefer back camera
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 }
+                },
+                (decodedText, decodedResult) => {
+                    // Success callback
+                    bookCodeInput.value = decodedText;
+                    
+                    // Visual feedback
+                    showFeedback('&#10003; Berhasil membaca QR! Teks dimasukkan otomatis.', true);
+                    
+                    // Stop camera after successful read
+                    stopScanner();
+                },
+                (errorMessage) => {
+                    // Ignore parse errors as they are frequent while positioning
+                }
+            ).catch((err) => {
+                // Startup error (e.g., no camera permission)
+                stopScanner();
+                showFeedback('Gagal mengakses kamera. Silakan ketik manual. Detail: ' + err, false);
+            });
+        });
+        
+        btnStop.addEventListener('click', function() {
+            stopScanner();
+        });
+        
+        function stopScanner() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then((ignore) => {
+                    readerContainer.style.display = 'none';
+                    btnStart.style.display = 'flex';
+                    btnStop.style.display = 'none';
+                }).catch((err) => {
+                    console.error("Gagal mematikan scanner.", err);
+                });
+            } else {
+                readerContainer.style.display = 'none';
+                btnStart.style.display = 'flex';
+                btnStop.style.display = 'none';
+            }
+        }
+    });
+    </script>
 </main>
 <?php
 require_once __DIR__ . '/../app/views/layouts/bottom-nav.php';

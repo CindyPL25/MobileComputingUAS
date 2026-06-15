@@ -46,7 +46,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ..invalidate(booksProvider)
         ..invalidate(borrowingsProvider)
         ..invalidate(notificationsProvider);
-      if (mounted) context.go('/home');
+      if (mounted) {
+        if (user.role == 'admin') {
+          context.go('/admin-dashboard');
+        } else {
+          context.go('/home');
+        }
+      }
     } catch (error) {
       _showMessage(error.toString().replaceFirst('Exception: ', ''));
     }

@@ -19,6 +19,5 @@
         <a class="<?= active_class('admin-qr.php'); ?>" href="<?= page_url('admin-qr.php'); ?>"><span>QR</span>QR Scan</a>
         <a class="<?= active_class('admin-profile.php'); ?>" href="<?= page_url('admin-profile.php'); ?>"><span>AD</span>Profil Admin</a>
     </nav>
-
-    <a class="admin-exit" href="<?= page_url('index.php'); ?>">Lihat Website</a>
+    
 </aside>

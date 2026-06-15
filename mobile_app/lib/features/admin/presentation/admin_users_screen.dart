@@ -2,15 +2,49 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../shared/models/app_models.dart';
 import '../../../shared/providers/api_providers.dart';
 import '../../../shared/widgets/library_chrome.dart';
 
-class AdminUsersScreen extends ConsumerWidget {
+class AdminUsersScreen extends ConsumerStatefulWidget {
   const AdminUsersScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final dashboardState = ref.watch(dashboardProvider);
+  ConsumerState<AdminUsersScreen> createState() => _AdminUsersScreenState();
+}
+
+class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
+  Future<void> _updateUserStatus(UserModel user, String newStatus) async {
+    try {
+      await ref.read(apiRepositoryProvider).updateUser({'id': user.id, 'status': newStatus});
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Status diubah menjadi $newStatus')));
+        ref.invalidate(adminUsersProvider);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.red));
+      }
+    }
+  }
+
+  Future<void> _updateUserRole(UserModel user, String newRole) async {
+    try {
+      await ref.read(apiRepositoryProvider).updateUser({'id': user.id, 'role': newRole});
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Role diubah menjadi $newRole')));
+        ref.invalidate(adminUsersProvider);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.red));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final usersState = ref.watch(adminUsersProvider);
 
     return LibraryAdminPage(
       child: dashboardState.when(
