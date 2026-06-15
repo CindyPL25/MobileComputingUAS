@@ -103,18 +103,6 @@ class _AdminBooksScreenState extends ConsumerState<AdminBooksScreen> {
                       onSave: _saveBook,
                     ),
                     const SizedBox(height: 16),
-                    _BookForm(
-                      formKey: _formKey,
-                      titleController: _titleController,
-                      authorController: _authorController,
-                      categoryController: _categoryController,
-                      bookCodeController: _bookCodeController,
-                      stockController: _stockController,
-                      coverController: _coverController,
-                      isSaving: _isSaving,
-                      onSave: _saveBook,
-                    ),
-                    const SizedBox(height: 16),
                     Text('${books.length} koleksi', style: const TextStyle(color: AppTheme.muted, fontSize: 12)),
                     const SizedBox(height: 12),
                     if (books.isEmpty)
@@ -122,7 +110,15 @@ class _AdminBooksScreenState extends ConsumerState<AdminBooksScreen> {
                     else
                       LibraryResponsiveGrid(
                         minTileWidth: 430,
-                        children: books.map(_BookTile.new).toList(),
+                        children: books.map((book) => _BookTile(
+                          book: book,
+                          onEdit: () {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fitur edit akan segera hadir.')));
+                          },
+                          onDelete: () {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Fitur hapus akan segera hadir.')));
+                          },
+                        )).toList(),
                       ),
                   ],
                 ),

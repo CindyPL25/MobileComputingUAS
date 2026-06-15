@@ -149,7 +149,7 @@ class ApiRepository {
   }
 
   Future<List<BookModel>> fetchBooks() async {
-    final response = await _dio.get<Map<String, dynamic>>('books.php');
+    final response = await _dio.get<Map<String, dynamic>>('books.php', options: await _authOptions());
     return _unwrapList(response).map(BookModel.fromJson).toList();
   }
 

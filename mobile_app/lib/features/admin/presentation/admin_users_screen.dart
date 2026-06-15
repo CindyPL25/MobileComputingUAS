@@ -14,37 +14,9 @@ class AdminUsersScreen extends ConsumerStatefulWidget {
 }
 
 class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
-  Future<void> _updateUserStatus(UserModel user, String newStatus) async {
-    try {
-      await ref.read(apiRepositoryProvider).updateUser({'id': user.id, 'status': newStatus});
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Status diubah menjadi $newStatus')));
-        ref.invalidate(adminUsersProvider);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.red));
-      }
-    }
-  }
-
-  Future<void> _updateUserRole(UserModel user, String newRole) async {
-    try {
-      await ref.read(apiRepositoryProvider).updateUser({'id': user.id, 'role': newRole});
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Role diubah menjadi $newRole')));
-        ref.invalidate(adminUsersProvider);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.red));
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final usersState = ref.watch(adminUsersProvider);
+    final dashboardState = ref.watch(dashboardProvider);
 
     return LibraryAdminPage(
       child: dashboardState.when(
