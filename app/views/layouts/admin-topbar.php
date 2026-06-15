@@ -8,5 +8,5 @@
         <span>Cari</span>
         <input id="adminSearch" type="search" placeholder="Cari buku, mahasiswa, QR">
     </label>
-    <a href="<?= page_url('logout.php'); ?>" class="admin-user-pill logout-link" title="Logout">Logout</a>
+    <a href="<?= page_url('logout.php?redirect=admin'); ?>" class="admin-user-pill logout-link" title="Logout">Logout</a>
 </header>

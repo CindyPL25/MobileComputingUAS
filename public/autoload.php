@@ -57,7 +57,7 @@ function requireLogin() {
 // Redirect to login if not admin
 function requireAdmin() {
     if (!isAdmin()) {
-        header('Location: dashboard.php');
+        header('Location: ' . (isLoggedIn() ? 'dashboard.php' : 'admin-login.php'));
         exit;
     }
 }
