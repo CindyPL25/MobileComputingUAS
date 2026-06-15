@@ -4,7 +4,7 @@
         <div class="hero-content">
             <span class="eyebrow">Perpustakaan digital kampus</span>
             <h1>Mobile E-Library Kampus</h1>
-            <p>Sistem perpustakaan mobile web untuk mencari katalog buku, melihat detail koleksi, dan memproses QR Code buku langsung ke database.</p>
+            <p>Sistem perpustakaan mobile web untuk mencari katalog buku, melihat detail koleksi, dan memproses QR Code buku.</p>
             <div class="hero-actions">
                 <a class="btn btn-primary" href="<?= page_url('dashboard.php'); ?>">Mulai Baca</a>
                 <a class="btn btn-light" href="<?= page_url('catalog.php'); ?>">Lihat Katalog</a>

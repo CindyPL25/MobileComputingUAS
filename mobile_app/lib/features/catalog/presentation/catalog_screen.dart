@@ -48,7 +48,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                       const LibrarySectionHeader(
                         eyebrow: 'Katalog Digital',
                         title: 'Temukan buku kampus',
-                        subtitle: 'Cari koleksi, cek stok, lalu buka detail buku langsung dari backend.',
+                        subtitle: 'Cari koleksi, cek stok, lalu buka detail buku.',
                       ),
                       const SizedBox(height: 16),
                       TextField(

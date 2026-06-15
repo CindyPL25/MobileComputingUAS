@@ -72,7 +72,7 @@ class HomeScreen extends ConsumerWidget {
                         const SizedBox(height: 24),
                         LibrarySectionHeader(
                           eyebrow: 'Rekomendasi',
-                          title: 'Buku dari database',
+                          title: 'Buku',
                           action: TextButton(onPressed: () => context.go('/catalog'), child: const Text('Lihat semua')),
                         ),
                         const SizedBox(height: 12),
