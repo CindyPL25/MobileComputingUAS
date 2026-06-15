@@ -198,7 +198,7 @@ class AdminBorrowingModel {
       dueDate: _asString(json['due_date']),
       returnDate: _asString(json['return_date']),
       status: _statusLabel(_asString(json['status'])),
-      fineAmount: (json['fine_amount'] as num?)?.toDouble() ?? 0.0,
+      fineAmount: _asDouble(json['fine_amount']),
       notes: _asString(json['notes']),
     );
   }
@@ -251,6 +251,12 @@ int _asInt(dynamic value) {
   if (value is int) return value;
   if (value is num) return value.toInt();
   return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+double _asDouble(dynamic value) {
+  if (value is double) return value;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value?.toString() ?? '') ?? 0.0;
 }
 
 String _asString(dynamic value) => value?.toString() ?? '';

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../shared/models/app_models.dart';
 import '../../../shared/providers/api_providers.dart';
 import '../../../shared/widgets/library_chrome.dart';
 

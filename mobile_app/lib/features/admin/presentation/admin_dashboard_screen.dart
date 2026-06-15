@@ -13,14 +13,12 @@ class AdminDashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dashboardState = ref.watch(dashboardProvider);
-    final historyState = ref.watch(borrowingsProvider);
 
     return LibraryAdminPage(
       child: dashboardState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString(), style: const TextStyle(color: AppTheme.red))),
         data: (stats) {
-          final histories = historyState.valueOrNull ?? <HistoryModel>[];
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,17 +58,6 @@ class AdminDashboardScreen extends ConsumerWidget {
                           LibraryStatCard(label: 'Kategori', value: stats.totalCategories.toString(), icon: Icons.category, color: AppTheme.muted),
                         ],
                       ),
-                      const SizedBox(height: 24),
-                      const LibrarySectionHeader(
-                        eyebrow: 'Peminjaman',
-                        title: 'Monitoring singkat',
-                        subtitle: 'Buku peminjaman.',
-                      ),
-                      const SizedBox(height: 12),
-                      if (histories.isEmpty)
-                        const LibrarySurfaceCard(child: Text('Belum ada data peminjaman.', style: TextStyle(color: AppTheme.muted)))
-                      else
-                        ...histories.take(3).map(_HistoryTile.new),
                     ],
                   ),
                 ),
@@ -83,31 +70,3 @@ class AdminDashboardScreen extends ConsumerWidget {
   }
 }
 
-class _HistoryTile extends StatelessWidget {
-  const _HistoryTile(this.item);
-
-  final HistoryModel item;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppTheme.line)),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(item.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.navy), maxLines: 1, overflow: TextOverflow.ellipsis),
-                Text('${item.borrowedAt} - ${item.returnedAt.isEmpty ? item.dueDate : item.returnedAt}', style: const TextStyle(fontSize: 11, color: AppTheme.muted)),
-              ],
-            ),
-          ),
-          Text(item.status, style: const TextStyle(fontSize: 10, color: AppTheme.green, fontWeight: FontWeight.bold))
-        ],
-      ),
-    );
-  }
-}

@@ -110,42 +110,6 @@ class LandingScreen extends ConsumerWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: 34),
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isWide = constraints.maxWidth > 820;
-                          final cards = const [
-                            _RoleCard(
-                              icon: Icons.school,
-                              title: 'Untuk Mahasiswa',
-                              text: 'Login, buka katalog, lihat detail buku, pantau riwayat, baca notifikasi, dan gunakan QR dari menu scan.',
-                            ),
-                            _RoleCard(
-                              icon: Icons.admin_panel_settings,
-                              title: 'Untuk Admin',
-                              text: 'Masuk ke panel pengelola, lihat ringkasan backend, cek koleksi buku, peminjaman, dan daftar kode QR.',
-                            ),
-                          ];
-
-                          if (!isWide) {
-                            return Column(
-                              children: [
-                                cards[0],
-                                const SizedBox(height: 14),
-                                cards[1],
-                              ],
-                            );
-                          }
-
-                          return const Row(
-                            children: [
-                              Expanded(child: _RoleCard(icon: Icons.school, title: 'Untuk Mahasiswa', text: 'Login, buka katalog, lihat detail buku, pantau riwayat, baca notifikasi, dan gunakan QR dari menu scan.')),
-                              SizedBox(width: 14),
-                              Expanded(child: _RoleCard(icon: Icons.admin_panel_settings, title: 'Untuk Admin', text: 'Masuk ke panel pengelola, lihat ringkasan backend, cek koleksi buku, peminjaman, dan daftar kode QR.')),
-                            ],
-                          );
-                        },
-                      ),
                     ],
                   ),
                 ),
@@ -214,39 +178,3 @@ class _MiniStat extends StatelessWidget {
   }
 }
 
-class _RoleCard extends StatelessWidget {
-  const _RoleCard({required this.icon, required this.title, required this.text});
-
-  final IconData icon;
-  final String title;
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return LibrarySurfaceCard(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(color: AppTheme.navy, borderRadius: BorderRadius.circular(8)),
-            child: Icon(icon, color: Colors.white),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(color: AppTheme.navy, fontSize: 18, fontWeight: FontWeight.w900)),
-                const SizedBox(height: 8),
-                Text(text, style: const TextStyle(color: AppTheme.muted, height: 1.45)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
