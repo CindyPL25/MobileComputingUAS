@@ -2,7 +2,7 @@
     <section class="page-title">
         <span class="eyebrow">Katalog digital</span>
         <h1>Temukan buku kampus</h1>
-        <p>Cari koleksi berdasarkan judul, penulis, atau kategori dari database perpustakaan.</p>
+        <p>Cari koleksi berdasarkan judul, penulis, atau kategori </p>
     </section>
 
     <?php include __DIR__ . '/../components/search-bar.php'; ?>

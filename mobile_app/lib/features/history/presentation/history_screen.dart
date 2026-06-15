@@ -25,7 +25,7 @@ class HistoryScreen extends ConsumerWidget {
               child: LibrarySectionHeader(
                 eyebrow: 'Riwayat',
                 title: 'Peminjaman buku',
-                subtitle: 'Pantau daftar peminjaman dan pengembalian buku dari database backend.',
+                subtitle: 'Pantau daftar peminjaman dan pengembalian buku.',
               ),
             ),
           ),

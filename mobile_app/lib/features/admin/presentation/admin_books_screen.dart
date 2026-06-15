@@ -86,8 +86,8 @@ class _AdminBooksScreenState extends ConsumerState<AdminBooksScreen> {
                     const LibrarySurfaceCard(
                       child: LibrarySectionHeader(
                         eyebrow: 'Data Buku',
-                        title: 'Koleksi dari backend',
-                        subtitle: 'Tambah koleksi baru dan pantau data buku dari database.',
+                        title: 'Koleksi Buku',
+                        subtitle: 'Tambah koleksi baru dan pantau data buku.',
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -189,7 +189,7 @@ class _BookForm extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: isSaving ? null : onSave,
-                    child: Text(isSaving ? 'Menyimpan...' : 'Simpan Buku ke Backend'),
+                    child: Text(isSaving ? 'Menyimpan...' : 'Simpan Buku'),
                   ),
                 ),
               ],

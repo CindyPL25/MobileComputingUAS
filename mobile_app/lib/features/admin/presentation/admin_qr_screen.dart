@@ -25,8 +25,8 @@ class AdminQrScreen extends ConsumerWidget {
                   const LibrarySurfaceCard(
                     child: LibrarySectionHeader(
                       eyebrow: 'QR Code',
-                      title: 'Kode QR dari database',
-                      subtitle: 'Kode buku berasal dari /books dan bisa dipindai di menu Scan.',
+                      title: 'Kode QR',
+                      subtitle: 'Kode buku bisa dipindai di menu Scan.',
                     ),
                   ),
                   const SizedBox(height: 16),

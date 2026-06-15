@@ -130,7 +130,7 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
                     const LibrarySectionHeader(
                       eyebrow: 'Scanner',
                       title: 'Scan kode buku',
-                      subtitle: 'Arahkan kamera ke QR Code buku. Hasil scan dikirim ke backend untuk validasi, peminjaman, atau pengembalian.',
+                      subtitle: 'Arahkan kamera ke QR Code buku. Hasil scan dikirim untuk validasi, peminjaman, atau pengembalian.',
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -177,7 +177,7 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Proses QR Backend', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.navy)),
+                    const Text('QR Scanner', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.navy)),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<QrAction>(
                       initialValue: _action,
@@ -207,7 +207,7 @@ class _QrScannerScreenState extends ConsumerState<QrScannerScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: _isProcessing ? null : _processManualCode,
-                        child: Text(_isProcessing ? 'Memproses...' : 'Kirim ke Backend'),
+                        child: Text(_isProcessing ? 'Memproses...' : 'Kirim'),
                       ),
                     ),
                     if (_result != null) ...[

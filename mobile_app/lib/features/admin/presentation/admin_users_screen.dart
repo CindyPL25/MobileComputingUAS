@@ -31,7 +31,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                 const LibrarySectionHeader(
                   eyebrow: 'Portal Pengguna',
                   title: 'Informasi akun mahasiswa dan admin',
-                  subtitle: 'Ringkasan akses pengguna yang terhubung ke backend PHP Native dan database MySQL.',
+                  subtitle: 'Ringkasan akses pengguna.',
                 ),
                 const SizedBox(height: 18),
                 LibraryResponsiveGrid(

@@ -28,8 +28,8 @@ class AdminDashboardScreen extends ConsumerWidget {
                 LibraryHeroPanel(
                   compact: true,
                   eyebrow: 'Panel Admin',
-                  title: 'Ringkasan backend',
-                  subtitle: 'Kelola koleksi, pantau peminjaman, dan siapkan kode QR buku dari database yang sama dengan website PHP Native.',
+                  title: 'Admin',
+                  subtitle: 'Kelola koleksi, pantau peminjaman, dan siapkan kode QR buku.',
                   imagePath: 'images/home-library-service.png',
                   actions: [
                     ElevatedButton(onPressed: () => context.push('/admin-books'), child: const Text('Data Buku')),
@@ -62,9 +62,9 @@ class AdminDashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 24),
                       const LibrarySectionHeader(
-                        eyebrow: 'Peminjaman Akun Ini',
+                        eyebrow: 'Peminjaman',
                         title: 'Monitoring singkat',
-                        subtitle: 'Endpoint API mobile saat ini mengembalikan peminjaman milik token aktif.',
+                        subtitle: 'Buku peminjaman.',
                       ),
                       const SizedBox(height: 12),
                       if (histories.isEmpty)
