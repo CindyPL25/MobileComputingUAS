@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/providers/api_providers.dart';
@@ -45,7 +46,23 @@ class AdminQrScreen extends ConsumerWidget {
                           decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppTheme.line)),
                           child: Row(
                             children: [
-                              const Icon(Icons.qr_code_2, color: AppTheme.navy, size: 36),
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(color: AppTheme.line),
+                                ),
+                                padding: const EdgeInsets.all(4),
+                                child: book.bookCode.isEmpty
+                                    ? const Center(child: Icon(Icons.qr_code_2, color: Colors.black26, size: 36))
+                                    : QrImageView(
+                                        data: book.bookCode,
+                                        version: QrVersions.auto,
+                                        size: 70.0,
+                                      ),
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(

@@ -34,14 +34,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     try {
-      await ref.read(authControllerProvider.notifier).login(identity, password);
+      final user = await ref.read(authControllerProvider.notifier).login(identity, password);
       ref
         ..invalidate(profileProvider)
         ..invalidate(dashboardProvider)
         ..invalidate(booksProvider)
         ..invalidate(borrowingsProvider)
         ..invalidate(notificationsProvider);
-      if (mounted) context.go('/home');
+      if (mounted) {
+        if (user.role == 'admin') {
+          context.go('/admin-dashboard');
+        } else {
+          context.go('/home');
+        }
+      }
     } catch (error) {
       _showMessage(error.toString().replaceFirst('Exception: ', ''));
     }

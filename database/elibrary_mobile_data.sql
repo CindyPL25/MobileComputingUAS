@@ -32,7 +32,7 @@ INSERT INTO users (nim, name, email, password, role, major, status, avatar) VALU
 
 -- Admin
 ('A001', 'Siti Nurhaliza', 'siti@admin.ac.id', '$2y$10$AXpASSzdYOkcQ8vqz/KYeO5I1QMIEn6h6m9uSbOsZMW2W1P1GOWaO', 'admin', NULL, 'aktif', 'https://ui-avatars.com/api/?name=Siti+Nurhaliza'),
-('A002', 'Eka Putri Wijaya', 'eka@admin.ac.id', '$2y$10$AXpASSzdYOkcQ8vqz/KYeO5I1QMIEn6h6m9uSbOsZMW2W1P1GOWaO', 'admin', NULL, 'aktif', 'https://ui-avatars.com/api/?name=Eka+Putri+Wijaya'),
+('A002', 'Akeyla Putri Wijaya', 'Akeyla@admin.ac.id', '$2y$10$AXpASSzdYOkcQ8vqz/KYeO5I1QMIEn6h6m9uSbOsZMW2W1P1GOWaO', 'admin', NULL, 'aktif', 'https://ui-avatars.com/api/?name=Eka+Putri+Wijaya'),
 ('A003', 'Ahmad Rahmat', 'ahmad@admin.ac.id', '$2y$10$AXpASSzdYOkcQ8vqz/KYeO5I1QMIEn6h6m9uSbOsZMW2W1P1GOWaO', 'admin', NULL, 'aktif', 'https://ui-avatars.com/api/?name=Ahmad+Rahmat');
 
 -- =====================================================

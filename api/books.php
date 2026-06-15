@@ -8,8 +8,7 @@ api_guard(function() {
         send_json(false, "Method not allowed", null, 405);
     }
 
-    // Require token even for books list
-    require_auth();
+    // Public access allowed for catalog
 
     $bookModel = new Book();
     $books = $bookModel->getRecentWithCategory(100);

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/widgets/library_chrome.dart';
 
-class LandingScreen extends StatelessWidget {
+class LandingScreen extends ConsumerWidget {
   const LandingScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    
     return Scaffold(
       backgroundColor: AppTheme.cream,
       body: SingleChildScrollView(
@@ -29,7 +31,7 @@ class LandingScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(backgroundColor: AppTheme.surface, foregroundColor: AppTheme.navy),
                   child: const Text('Lihat Katalog'),
                 ),
-                OutlinedButton(onPressed: () => context.push('/qr'), child: const Text('Scan QR')),
+                OutlinedButton(onPressed: () => context.push('/login'), child: const Text('Scan QR')),
               ],
             ),
             Padding(
@@ -98,7 +100,7 @@ class LandingScreen extends StatelessWidget {
                             physics: const NeverScrollableScrollPhysics(),
                             crossAxisSpacing: 14,
                             mainAxisSpacing: 14,
-                            childAspectRatio: isDesktop ? 1.65 : (isPhone ? 2.45 : 1.25),
+                            childAspectRatio: isDesktop ? 1.55 : (isPhone ? 2.25 : 1.15),
                             children: const [
                               _FeatureCard(icon: Icons.library_books, title: 'Katalog Buku', text: 'Cari koleksi dan cek stok buku dari MySQL.'),
                               _FeatureCard(icon: Icons.qr_code_scanner, title: 'Scan QR', text: 'Validasi kode buku untuk proses pinjam/kembali.'),

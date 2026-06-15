@@ -20,6 +20,32 @@ $editingBook = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
     
+    $coverImagePath = '';
+    if ($action === 'edit') {
+        $coverImagePath = $_POST['existing_cover_image'] ?? '';
+    }
+
+    if (isset($_FILES['cover_image_file']) && $_FILES['cover_image_file']['error'] === UPLOAD_ERR_OK) {
+        $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        $fileTmp = $_FILES['cover_image_file']['tmp_name'];
+        // Fallback checks
+        $fileType = function_exists('mime_content_type') ? mime_content_type($fileTmp) : 'image/jpeg';
+        
+        if (in_array($fileType, $allowedTypes)) {
+            $ext = pathinfo($_FILES['cover_image_file']['name'], PATHINFO_EXTENSION);
+            $filename = 'cover_' . time() . '_' . rand(100, 999) . '.' . strtolower($ext);
+            $uploadDir = __DIR__ . '/../assets/images/books/';
+            
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            
+            if (move_uploaded_file($fileTmp, $uploadDir . $filename)) {
+                $coverImagePath = 'images/books/' . $filename;
+            }
+        }
+    }
+    
     if ($action === 'add') {
         $stock = max(0, (int) ($_POST['stock'] ?? 0));
         $bookCode = trim($_POST['book_code'] ?? '');
@@ -35,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'isbn' => trim($_POST['isbn'] ?? ''),
             'category_id' => (int) ($_POST['category_id'] ?? 0),
             'description' => trim($_POST['description'] ?? ''),
-            'cover_image' => trim($_POST['cover_image'] ?? ''),
+            'cover_image' => $coverImagePath,
             'stock' => $stock,
             'available_stock' => $stock,
             'book_code' => $bookCode
@@ -70,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'isbn' => trim($_POST['isbn'] ?? ''),
                 'category_id' => (int) ($_POST['category_id'] ?? 0),
                 'description' => trim($_POST['description'] ?? ''),
-                'cover_image' => trim($_POST['cover_image'] ?? ''),
+                'cover_image' => $coverImagePath,
                 'book_code' => trim($_POST['book_code'] ?? $currentBook['book_code']),
                 'stock' => $stock,
                 'available_stock' => $stock - $borrowedCopies

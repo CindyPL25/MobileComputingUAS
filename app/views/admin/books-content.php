@@ -24,7 +24,7 @@
         <h2><?= $editingBook ? 'Edit Buku' : 'Form Buku'; ?></h2>
         <span><?= $editingBook ? 'Perbarui koleksi' : 'Tambah koleksi baru'; ?></span>
     </div>
-    <form class="admin-form" method="POST" action="">
+    <form class="admin-form" method="POST" action="" enctype="multipart/form-data">
         <input type="hidden" name="action" value="<?= $editingBook ? 'edit' : 'add'; ?>">
         <?php if ($editingBook): ?>
             <input type="hidden" name="id" value="<?= e((string) $editingBook['id']); ?>">
@@ -72,7 +72,16 @@
             
             <label>
                 <span>Cover Image</span>
-                <input type="text" name="cover_image" value="<?= e($editingBook['cover_image'] ?? ''); ?>" placeholder="assets/images/books/cover.png">
+                <?php if ($editingBook && !empty($editingBook['cover_image'])): ?>
+                    <div style="margin-bottom: 0.5rem;">
+                        <img src="<?= media_url($editingBook['cover_image']); ?>" alt="Current Cover" style="width: 50px; height: 75px; object-fit: cover; border-radius: 4px; vertical-align: middle;">
+                        <span style="font-size: 0.8rem; margin-left: 0.5rem;">Cover saat ini (biarkan kosong jika tidak diubah)</span>
+                    </div>
+                <?php endif; ?>
+                <input type="file" name="cover_image_file" accept=".jpg,.jpeg,.png,.webp">
+                <?php if ($editingBook): ?>
+                    <input type="hidden" name="existing_cover_image" value="<?= e($editingBook['cover_image'] ?? ''); ?>">
+                <?php endif; ?>
             </label>
         </div>
         

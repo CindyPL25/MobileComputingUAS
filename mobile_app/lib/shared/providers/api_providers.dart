@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/config/app_environment.dart';
@@ -11,8 +11,8 @@ final appEnvironmentProvider = Provider<AppEnvironment>((ref) {
   return AppEnvironment.fromDartDefine();
 });
 
-final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage();
+final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
+  throw UnimplementedError('sharedPreferencesProvider must be overridden');
 });
 
 final networkClientProvider = Provider<NetworkClient>((ref) {
@@ -23,7 +23,7 @@ final networkClientProvider = Provider<NetworkClient>((ref) {
 final apiRepositoryProvider = Provider<ApiRepository>((ref) {
   return ApiRepository(
     dio: ref.watch(networkClientProvider).dio,
-    storage: ref.watch(secureStorageProvider),
+    prefs: ref.watch(sharedPreferencesProvider),
   );
 });
 
@@ -45,6 +45,10 @@ final booksProvider = FutureProvider<List<BookModel>>((ref) {
 
 final bookDetailProvider = FutureProvider.family<BookModel, int>((ref, id) {
   return ref.watch(apiRepositoryProvider).fetchBookDetail(id);
+});
+
+final adminUsersProvider = FutureProvider<List<UserModel>>((ref) {
+  return ref.watch(apiRepositoryProvider).fetchAdminUsers();
 });
 
 final borrowingsProvider = FutureProvider<List<HistoryModel>>((ref) {
@@ -101,16 +105,16 @@ class AuthController extends StateNotifier<AsyncValue<UserModel?>> {
 }
 
 class ApiRepository {
-  ApiRepository({required Dio dio, required FlutterSecureStorage storage})
+  ApiRepository({required Dio dio, required SharedPreferences prefs})
       : _dio = dio,
-        _storage = storage;
+        _prefs = prefs;
 
   final Dio _dio;
-  final FlutterSecureStorage _storage;
+  final SharedPreferences _prefs;
 
-  Future<String?> readToken() => _storage.read(key: AppConstants.secureTokenKey);
+  Future<String?> readToken() async => _prefs.getString(AppConstants.secureTokenKey);
 
-  Future<void> clearToken() => _storage.delete(key: AppConstants.secureTokenKey);
+  Future<void> clearToken() async => _prefs.remove(AppConstants.secureTokenKey);
 
   Future<UserModel> login({required String identity, required String password}) async {
     final response = await _dio.post<Map<String, dynamic>>(
@@ -122,7 +126,7 @@ class ApiRepository {
     if (token == null || token.isEmpty) {
       throw Exception('Token tidak ditemukan pada response login.');
     }
-    await _storage.write(key: AppConstants.secureTokenKey, value: token);
+    await _prefs.setString(AppConstants.secureTokenKey, token);
     return UserModel.fromJson(data);
   }
 
@@ -145,7 +149,7 @@ class ApiRepository {
   }
 
   Future<List<BookModel>> fetchBooks() async {
-    final response = await _dio.get<Map<String, dynamic>>('books.php', options: await _authOptions());
+    final response = await _dio.get<Map<String, dynamic>>('books.php');
     return _unwrapList(response).map(BookModel.fromJson).toList();
   }
 
@@ -153,7 +157,6 @@ class ApiRepository {
     final response = await _dio.get<Map<String, dynamic>>(
       'book-detail.php',
       queryParameters: {'id': id},
-      options: await _authOptions(),
     );
     return BookModel.fromJson(_unwrapMap(response));
   }
@@ -166,6 +169,29 @@ class ApiRepository {
   Future<List<NotificationModel>> fetchNotifications() async {
     final response = await _dio.get<Map<String, dynamic>>('notifications.php', options: await _authOptions());
     return _unwrapList(response).map(NotificationModel.fromJson).toList();
+  }
+
+  // --- Admin Books CRUD ---
+  Future<void> addBook(Map<String, dynamic> data) async {
+    await _dio.post<Map<String, dynamic>>('admin-books.php', data: data, options: await _authOptions());
+  }
+
+  Future<void> updateBook(Map<String, dynamic> data) async {
+    await _dio.put<Map<String, dynamic>>('admin-books.php', data: data, options: await _authOptions());
+  }
+
+  Future<void> deleteBook(int id) async {
+    await _dio.delete<Map<String, dynamic>>('admin-books.php', data: {'id': id}, options: await _authOptions());
+  }
+
+  // --- Admin Users CRUD ---
+  Future<List<UserModel>> fetchAdminUsers() async {
+    final response = await _dio.get<Map<String, dynamic>>('admin-users.php', options: await _authOptions());
+    return _unwrapList(response).map(UserModel.fromJson).toList();
+  }
+
+  Future<void> updateUser(Map<String, dynamic> data) async {
+    await _dio.put<Map<String, dynamic>>('admin-users.php', data: data, options: await _authOptions());
   }
 
   Future<QrActionResult> validateBookCode(String bookCode) async {

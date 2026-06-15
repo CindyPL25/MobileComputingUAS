@@ -49,7 +49,7 @@ function isAdmin() {
 // Redirect to login if not authenticated
 function requireLogin() {
     if (!isLoggedIn()) {
-        header('Location: /login.php');
+        header('Location: login.php');
         exit;
     }
 }
@@ -57,7 +57,7 @@ function requireLogin() {
 // Redirect to login if not admin
 function requireAdmin() {
     if (!isAdmin()) {
-        header('Location: /dashboard.php');
+        header('Location: dashboard.php');
         exit;
     }
 }

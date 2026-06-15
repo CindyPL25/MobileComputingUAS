@@ -8,7 +8,7 @@ api_guard(function() {
         send_json(false, "Method not allowed", null, 405);
     }
 
-    require_auth();
+    // Public access allowed
 
     $id = $_GET['id'] ?? null;
 

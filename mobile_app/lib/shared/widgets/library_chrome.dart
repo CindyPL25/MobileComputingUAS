@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/config/app_environment.dart';
 import '../../core/theme/app_theme.dart';
+import '../providers/api_providers.dart';
 
 class LibraryChrome {
   const LibraryChrome._();
@@ -12,7 +14,7 @@ class LibraryChrome {
   }
 }
 
-class LibraryBrandBar extends StatelessWidget {
+class LibraryBrandBar extends ConsumerWidget {
   const LibraryBrandBar({
     super.key,
     this.trailing,
@@ -25,14 +27,20 @@ class LibraryBrandBar extends StatelessWidget {
   final VoidCallback? onLogout;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authControllerProvider).valueOrNull;
+    final isLoggedIn = user != null;
+    final isAdmin = isLoggedIn && user.role == 'admin';
+    final isUser = isLoggedIn && user.role == 'mahasiswa';
+
     final navItems = [
-      ('Home', '/landing'),
+      ('Home', isLoggedIn ? (isAdmin ? '/admin-dashboard' : '/home') : '/landing'),
       ('Katalog', '/catalog'),
-      ('Scan QR', '/qr'),
-      ('Riwayat', '/history'),
-      ('Profil', '/profile'),
-      ('Admin', '/admin-login'),
+      if (!isLoggedIn) ('Login', '/login'),
+      if (isLoggedIn) ('Scan QR', '/qr'),
+      if (isUser) ('Riwayat', '/history'),
+      if (isLoggedIn) ('Profil', '/profile'),
+      if (isAdmin) ('Admin', '/admin-dashboard'),
     ];
 
     return LayoutBuilder(

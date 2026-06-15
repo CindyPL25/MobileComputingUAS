@@ -33,13 +33,16 @@ class BookDetailScreen extends ConsumerWidget {
   }
 }
 
-class _BookDetailContent extends StatelessWidget {
+class _BookDetailContent extends ConsumerWidget {
   const _BookDetailContent({required this.book});
 
   final BookModel book;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authControllerProvider).valueOrNull;
+    final isLoggedIn = user != null;
+
     return SingleChildScrollView(
       child: LibraryContent(
         maxWidth: 980,
@@ -85,38 +88,40 @@ class _BookDetailContent extends StatelessWidget {
                   _buildMetaRow('Stok', '${book.availableStock}/${book.stock}'),
                   _buildMetaRow('Status', book.status, isStatus: true),
                   _buildMetaRow('Kode QR', book.bookCode),
-                  const SizedBox(height: 24),
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppTheme.cream,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppTheme.line),
+                  if (isLoggedIn) ...[
+                    const SizedBox(height: 24),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppTheme.cream,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppTheme.line),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.qr_code_2, size: 40, color: AppTheme.navy),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('QR Code Koleksi', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.navy)),
+                                Text(book.bookCode.isEmpty ? 'Kode QR belum tersedia.' : book.bookCode, style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.qr_code_2, size: 40, color: AppTheme.navy),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('QR Code Koleksi', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.navy)),
-                              Text(book.bookCode.isEmpty ? 'Kode QR belum tersedia.' : book.bookCode, style: const TextStyle(fontSize: 12, color: AppTheme.muted)),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: book.bookCode.isEmpty ? null : () => context.go('/qr?code=${Uri.encodeComponent(book.bookCode)}'),
-                      child: const Text('Pindah ke Scan QR'),
-                    ),
-                  )
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: book.bookCode.isEmpty ? null : () => context.go('/qr?code=${Uri.encodeComponent(book.bookCode)}'),
+                        child: const Text('Pindah ke Scan QR'),
+                      ),
+                    )
+                  ]
                 ],
               ),
             );

@@ -63,7 +63,7 @@ require_once __DIR__ . '/../app/views/layouts/header.php';
 <main class="auth-shell">
     <a class="auth-brand" href="<?= page_url('index.php'); ?>">
         <img src="<?= asset_url('images/logo.png'); ?>" alt="Logo E-Library">
-        <span>Mobile E-Library</span>
+        <span>Kembali ke E-Library</span>
     </a>
     <section class="auth-card">
         <span class="eyebrow">Akun baru</span>
