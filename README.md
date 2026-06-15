@@ -59,3 +59,4 @@ http://localhost/mobile-elibrary-qr/public/
 
 Folder `storage/` berisi file runtime log/session dan akan dibuat otomatis saat aplikasi berjalan .
 
+satu dua
