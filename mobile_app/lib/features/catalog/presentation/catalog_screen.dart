@@ -90,7 +90,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                           padding: const EdgeInsets.all(16),
                           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                             maxCrossAxisExtent: MediaQuery.sizeOf(context).width > 760 ? 520 : 900,
-                            mainAxisExtent: MediaQuery.sizeOf(context).width > 520 ? 198 : 178,
+                            mainAxisExtent: MediaQuery.sizeOf(context).width > 520 ? 198 : 204,
                             mainAxisSpacing: 14,
                             crossAxisSpacing: 14,
                           ),

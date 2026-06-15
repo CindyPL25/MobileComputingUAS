@@ -5,21 +5,74 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/app_models.dart';
 import '../../../shared/providers/api_providers.dart';
 import '../../../shared/widgets/library_chrome.dart';
-import 'widgets/admin_drawer.dart';
 
-class AdminBooksScreen extends ConsumerWidget {
+class AdminBooksScreen extends ConsumerStatefulWidget {
   const AdminBooksScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AdminBooksScreen> createState() => _AdminBooksScreenState();
+}
+
+class _AdminBooksScreenState extends ConsumerState<AdminBooksScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _authorController = TextEditingController();
+  final _categoryController = TextEditingController(text: 'Umum');
+  final _bookCodeController = TextEditingController();
+  final _stockController = TextEditingController(text: '1');
+  final _coverController = TextEditingController();
+  bool _isSaving = false;
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _authorController.dispose();
+    _categoryController.dispose();
+    _bookCodeController.dispose();
+    _stockController.dispose();
+    _coverController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveBook() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isSaving = true);
+    try {
+      await ref.read(apiRepositoryProvider).createBook(
+            title: _titleController.text.trim(),
+            author: _authorController.text.trim(),
+            category: _categoryController.text.trim(),
+            bookCode: _bookCodeController.text.trim(),
+            stock: int.tryParse(_stockController.text.trim()) ?? 1,
+            coverImage: _coverController.text.trim(),
+          );
+      ref
+        ..invalidate(booksProvider)
+        ..invalidate(dashboardProvider);
+      _titleController.clear();
+      _authorController.clear();
+      _categoryController.text = 'Umum';
+      _bookCodeController.clear();
+      _stockController.text = '1';
+      _coverController.clear();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Buku berhasil ditambahkan.')));
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))));
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final booksState = ref.watch(booksProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Data Buku', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-      ),
-      drawer: buildAdminDrawer(context),
-      body: booksState.when(
+    return LibraryAdminPage(
+      child: booksState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString(), style: const TextStyle(color: AppTheme.red))),
         data: (books) => RefreshIndicator(
@@ -34,8 +87,20 @@ class AdminBooksScreen extends ConsumerWidget {
                       child: LibrarySectionHeader(
                         eyebrow: 'Data Buku',
                         title: 'Koleksi dari backend',
-                        subtitle: 'API mobile yang tersedia membaca data buku dari database.',
+                        subtitle: 'Tambah koleksi baru dan pantau data buku dari database.',
                       ),
+                    ),
+                    const SizedBox(height: 16),
+                    _BookForm(
+                      formKey: _formKey,
+                      titleController: _titleController,
+                      authorController: _authorController,
+                      categoryController: _categoryController,
+                      bookCodeController: _bookCodeController,
+                      stockController: _stockController,
+                      coverController: _coverController,
+                      isSaving: _isSaving,
+                      onSave: _saveBook,
                     ),
                     const SizedBox(height: 16),
                     Text('${books.length} koleksi', style: const TextStyle(color: AppTheme.muted, fontSize: 12)),
@@ -54,6 +119,97 @@ class AdminBooksScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _BookForm extends StatelessWidget {
+  const _BookForm({
+    required this.formKey,
+    required this.titleController,
+    required this.authorController,
+    required this.categoryController,
+    required this.bookCodeController,
+    required this.stockController,
+    required this.coverController,
+    required this.isSaving,
+    required this.onSave,
+  });
+
+  final GlobalKey<FormState> formKey;
+  final TextEditingController titleController;
+  final TextEditingController authorController;
+  final TextEditingController categoryController;
+  final TextEditingController bookCodeController;
+  final TextEditingController stockController;
+  final TextEditingController coverController;
+  final bool isSaving;
+  final VoidCallback onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    return LibrarySurfaceCard(
+      child: Form(
+        key: formKey,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth >= 720;
+            final fields = [
+              _field(titleController, 'Judul Buku', required: true),
+              _field(authorController, 'Penulis', required: true),
+              _field(categoryController, 'Kategori', required: true),
+              _field(bookCodeController, 'Kode Buku / QR', hint: 'BK001'),
+              _field(stockController, 'Stok', keyboardType: TextInputType.number, required: true),
+              _field(coverController, 'Cover Image', hint: 'images/books/nama-file.png'),
+            ];
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Input buku admin', style: TextStyle(color: AppTheme.navy, fontWeight: FontWeight.w900, fontSize: 16)),
+                const SizedBox(height: 12),
+                if (isWide)
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: fields.map((field) => SizedBox(width: (constraints.maxWidth - 12) / 2, child: field)).toList(),
+                  )
+                else
+                  Column(children: fields.map((field) => Padding(padding: const EdgeInsets.only(bottom: 12), child: field)).toList()),
+                const SizedBox(height: 14),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: isSaving ? null : onSave,
+                    child: Text(isSaving ? 'Menyimpan...' : 'Simpan Buku ke Backend'),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _field(
+    TextEditingController controller,
+    String label, {
+    String? hint,
+    bool required = false,
+    TextInputType? keyboardType,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(labelText: label, hintText: hint),
+      validator: required
+          ? (value) {
+              if ((value ?? '').trim().isEmpty) return '$label wajib diisi';
+              if (label == 'Stok' && (int.tryParse((value ?? '').trim()) ?? -1) < 0) return 'Stok tidak valid';
+              return null;
+            }
+          : null,
     );
   }
 }

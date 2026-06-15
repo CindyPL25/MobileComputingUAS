@@ -81,9 +81,9 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: const BorderSide(color: line)),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: surface,
-        selectedItemColor: navy,
-        unselectedItemColor: muted,
+        backgroundColor: navy,
+        selectedItemColor: gold,
+        unselectedItemColor: Colors.white70,
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: TextStyle(fontWeight: FontWeight.w800, fontSize: 11),
         unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w700, fontSize: 11),

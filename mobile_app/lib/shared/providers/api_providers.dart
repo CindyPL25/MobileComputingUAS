@@ -149,6 +149,37 @@ class ApiRepository {
     return _unwrapList(response).map(BookModel.fromJson).toList();
   }
 
+  Future<BookModel> createBook({
+    required String title,
+    required String author,
+    required String category,
+    required String bookCode,
+    required int stock,
+    String publisher = '',
+    String publicationYear = '',
+    String isbn = '',
+    String description = '',
+    String coverImage = '',
+  }) async {
+    final response = await _dio.post<Map<String, dynamic>>(
+      'books.php',
+      data: {
+        'title': title,
+        'author': author,
+        'category': category,
+        'book_code': bookCode,
+        'stock': stock,
+        'publisher': publisher,
+        'publication_year': publicationYear,
+        'isbn': isbn,
+        'description': description,
+        'cover_image': coverImage,
+      },
+      options: await _authOptions(),
+    );
+    return BookModel.fromJson(_unwrapMap(response));
+  }
+
   Future<BookModel> fetchBookDetail(int id) async {
     final response = await _dio.get<Map<String, dynamic>>(
       'book-detail.php',
