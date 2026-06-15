@@ -89,15 +89,15 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                         child: GridView.builder(
                           padding: const EdgeInsets.all(16),
                           gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                            maxCrossAxisExtent: MediaQuery.sizeOf(context).width > 760 ? 430 : 900,
-                            mainAxisExtent: 138,
-                            mainAxisSpacing: 12,
-                            crossAxisSpacing: 12,
+                            maxCrossAxisExtent: MediaQuery.sizeOf(context).width > 760 ? 520 : 900,
+                            mainAxisExtent: MediaQuery.sizeOf(context).width > 520 ? 198 : 178,
+                            mainAxisSpacing: 14,
+                            crossAxisSpacing: 14,
                           ),
                           itemCount: filteredBooks.length,
-                          itemBuilder: (context, index) => Center(
+                        itemBuilder: (context, index) => Center(
                             child: ConstrainedBox(
-                              constraints: const BoxConstraints(maxWidth: 430),
+                              constraints: const BoxConstraints(maxWidth: 520),
                               child: _buildBookCard(context, filteredBooks[index]),
                             ),
                           ),
@@ -115,7 +115,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     return GestureDetector(
       onTap: () => context.push('/book/${book.id}'),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppTheme.surface,
                           borderRadius: BorderRadius.circular(8),
@@ -125,7 +125,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _CoverImage(book.cover),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,9 +168,13 @@ class _CoverImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 80,
-      height: 110,
-      decoration: BoxDecoration(color: AppTheme.cream, borderRadius: BorderRadius.circular(6)),
+      width: 112,
+      height: 160,
+      decoration: BoxDecoration(
+        color: AppTheme.cream,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [BoxShadow(color: AppTheme.navy.withValues(alpha: 0.12), blurRadius: 14, offset: const Offset(0, 8))],
+      ),
       clipBehavior: Clip.antiAlias,
       child: url.isEmpty
           ? const Icon(Icons.menu_book, color: Colors.black26)

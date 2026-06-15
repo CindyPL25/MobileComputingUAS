@@ -44,7 +44,7 @@ class AdminBooksScreen extends ConsumerWidget {
                       const LibrarySurfaceCard(child: Text('Belum ada koleksi buku dari backend.', style: TextStyle(color: AppTheme.muted)))
                     else
                       LibraryResponsiveGrid(
-                        minTileWidth: 360,
+                        minTileWidth: 430,
                         children: books.map(_BookTile.new).toList(),
                       ),
                   ],
@@ -73,9 +73,13 @@ class _BookTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 60,
-            height: 80,
-            decoration: BoxDecoration(color: AppTheme.cream, borderRadius: BorderRadius.circular(4)),
+            width: 94,
+            height: 136,
+            decoration: BoxDecoration(
+              color: AppTheme.cream,
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [BoxShadow(color: AppTheme.navy.withValues(alpha: 0.1), blurRadius: 12, offset: const Offset(0, 7))],
+            ),
             clipBehavior: Clip.antiAlias,
             child: book.cover.isEmpty
                 ? const Icon(Icons.menu_book, color: Colors.black26, size: 24)

@@ -127,7 +127,7 @@ class HomeScreen extends ConsumerWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _BookCover(book.cover, width: 80, height: 110),
+            _BookCover(book.cover, width: 96, height: 138),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
