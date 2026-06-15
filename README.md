@@ -39,7 +39,7 @@ mobile-elibrary-qr/
 
 ## Cara Menjalankan di Localhost
 
-1. Letakkan folder `mobile-elibrary-qr` di dalam folder web server, misalnya `htdocs` XAMPP atau `www` Laragon.
+1. Letakkan folder `mobile-elibrary-qr` di dalam folder web server , misalnya `htdocs` XAMPP atau `www` Laragon.
 2. Import `database/elibrary_mobile.sql`, lalu `database/elibrary_mobile_data.sql`.
 3. Pastikan konfigurasi database sesuai `app/config/Database.php` atau environment `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`.
 4. Jalankan Apache dari XAMPP/Laragon.
