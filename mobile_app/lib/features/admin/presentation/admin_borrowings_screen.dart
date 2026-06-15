@@ -5,7 +5,6 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/app_models.dart';
 import '../../../shared/providers/api_providers.dart';
 import '../../../shared/widgets/library_chrome.dart';
-import 'widgets/admin_drawer.dart';
 
 class AdminBorrowingsScreen extends ConsumerWidget {
   const AdminBorrowingsScreen({super.key});
@@ -14,12 +13,8 @@ class AdminBorrowingsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final historyState = ref.watch(borrowingsProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Monitoring Peminjaman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-      ),
-      drawer: buildAdminDrawer(context),
-      body: historyState.when(
+    return LibraryAdminPage(
+      child: historyState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString(), style: const TextStyle(color: AppTheme.red))),
         data: (history) => RefreshIndicator(
@@ -34,8 +29,8 @@ class AdminBorrowingsScreen extends ConsumerWidget {
                     const LibrarySurfaceCard(
                       child: LibrarySectionHeader(
                         eyebrow: 'Peminjaman',
-                        title: 'Riwayat dari API',
-                        subtitle: 'Endpoint mobile mengembalikan riwayat untuk user token aktif.',
+                        title: 'Monitoring peminjaman',
+                        subtitle: 'Pantau status pinjam, jatuh tempo, dan pengembalian dari data backend aktif.',
                       ),
                     ),
                     const SizedBox(height: 16),

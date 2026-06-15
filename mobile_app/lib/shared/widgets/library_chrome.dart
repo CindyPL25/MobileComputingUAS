@@ -129,6 +129,131 @@ class LibraryBrandBar extends ConsumerWidget {
   }
 }
 
+class LibraryAdminBar extends StatelessWidget {
+  const LibraryAdminBar({
+    super.key,
+    this.onLogout,
+  });
+
+  final VoidCallback? onLogout;
+
+  @override
+  Widget build(BuildContext context) {
+    final navItems = [
+      ('Dashboard', '/admin-dashboard'),
+      ('Data Buku', '/admin-books'),
+      ('Peminjaman', '/admin-borrowings'),
+      ('Kode QR', '/admin-qr'),
+      ('Pengguna', '/admin-users'),
+      ('Profil', '/admin-profile'),
+    ];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useStackedNav = constraints.maxWidth < 760;
+        final nav = SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: navItems.map((item) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: _NavPill(label: item.$1, onTap: () => context.go(item.$2)),
+              );
+            }).toList(),
+          ),
+        );
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppTheme.navy.withValues(alpha: 0.96),
+            border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.08))),
+          ),
+          child: SafeArea(
+            bottom: false,
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1180),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(color: AppTheme.gold, borderRadius: BorderRadius.circular(8)),
+                          child: const Icon(Icons.admin_panel_settings, color: AppTheme.navy, size: 22),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Admin E-Library', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 17), overflow: TextOverflow.ellipsis),
+                              SizedBox(height: 2),
+                              Text('Portal pengelola kampus', style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 11), overflow: TextOverflow.ellipsis),
+                            ],
+                          ),
+                        ),
+                        if (!useStackedNav)
+                          Flexible(
+                            flex: 3,
+                            child: Align(alignment: Alignment.centerRight, child: nav),
+                          ),
+                        if (onLogout != null) ...[
+                          const SizedBox(width: 6),
+                          IconButton(
+                            tooltip: 'Logout',
+                            onPressed: onLogout,
+                            icon: const Icon(Icons.logout, color: Colors.white),
+                          ),
+                        ],
+                      ],
+                    ),
+                    if (useStackedNav) ...[
+                      const SizedBox(height: 10),
+                      SizedBox(width: double.infinity, child: nav),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class LibraryAdminPage extends ConsumerWidget {
+  const LibraryAdminPage({
+    super.key,
+    required this.child,
+  });
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      backgroundColor: AppTheme.cream,
+      body: Column(
+        children: [
+          LibraryAdminBar(
+            onLogout: () async {
+              await ref.read(authControllerProvider.notifier).logout();
+              if (context.mounted) context.go('/landing');
+            },
+          ),
+          Expanded(child: child),
+        ],
+      ),
+    );
+  }
+}
+
 class LibraryHeroPanel extends StatelessWidget {
   const LibraryHeroPanel({
     super.key,
@@ -242,25 +367,30 @@ class LibrarySectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(eyebrow.toUpperCase(), style: const TextStyle(color: AppTheme.gold, fontSize: 12, fontWeight: FontWeight.w900)),
-              const SizedBox(height: 4),
-              Text(title, style: const TextStyle(color: AppTheme.navy, fontSize: 22, fontWeight: FontWeight.w900, height: 1.08)),
-              if (subtitle != null) ...[
-                const SizedBox(height: 8),
-                Text(subtitle!, style: const TextStyle(color: AppTheme.muted, height: 1.4)),
-              ],
-            ],
-          ),
-        ),
-        if (action != null) action!,
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 760;
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(eyebrow.toUpperCase(), style: const TextStyle(color: AppTheme.gold, fontSize: 12, fontWeight: FontWeight.w900)),
+                  const SizedBox(height: 5),
+                  Text(title, style: TextStyle(color: AppTheme.navy, fontSize: isWide ? 26 : 22, fontWeight: FontWeight.w900, height: 1.08)),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: 9),
+                    Text(subtitle!, style: TextStyle(color: AppTheme.muted, fontSize: isWide ? 16 : 14, height: 1.45)),
+                  ],
+                ],
+              ),
+            ),
+            if (action != null) action!,
+          ],
+        );
+      },
     );
   }
 }
@@ -407,13 +537,13 @@ class _NavPill extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
-        child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12)),
+        child: Text(label, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13)),
       ),
     );
   }

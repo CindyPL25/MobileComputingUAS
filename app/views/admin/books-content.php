@@ -129,7 +129,7 @@
                     <tr>
                         <td>
                             <div class="admin-book-cell">
-                                <img src="<?= media_url($book['cover_image'] ?: 'images/logo.png'); ?>" alt="Cover <?= e($book['title']); ?>" style="width:40px;height:60px;object-fit:cover;border-radius:4px;">
+                                <img src="<?= media_url($book['cover_image'] ?: 'images/logo.png'); ?>" alt="Cover <?= e($book['title']); ?>" style="width:64px;height:92px;object-fit:cover;border-radius:8px;box-shadow:0 8px 18px rgba(12,47,89,.14);">
                                 <strong><?= e($book['title']); ?></strong>
                             </div>
                         </td>

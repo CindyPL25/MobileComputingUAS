@@ -6,7 +6,6 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/app_models.dart';
 import '../../../shared/providers/api_providers.dart';
 import '../../../shared/widgets/library_chrome.dart';
-import 'widgets/admin_drawer.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
   const AdminDashboardScreen({super.key});
@@ -16,22 +15,8 @@ class AdminDashboardScreen extends ConsumerWidget {
     final dashboardState = ref.watch(dashboardProvider);
     final historyState = ref.watch(borrowingsProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Dashboard', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        actions: [
-          IconButton(onPressed: () => context.push('/admin-profile'), icon: const Icon(Icons.person)),
-          IconButton(
-            onPressed: () async {
-              await ref.read(authControllerProvider.notifier).logout();
-              if (context.mounted) context.go('/landing');
-            },
-            icon: const Icon(Icons.logout),
-          )
-        ],
-      ),
-      drawer: buildAdminDrawer(context),
-      body: dashboardState.when(
+    return LibraryAdminPage(
+      child: dashboardState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString(), style: const TextStyle(color: AppTheme.red))),
         data: (stats) {
@@ -55,6 +40,17 @@ class AdminDashboardScreen extends ConsumerWidget {
                 LibraryContent(
                   child: Column(
                     children: [
+                      LibrarySectionHeader(
+                        eyebrow: 'Kontrol Admin',
+                        title: 'Kelola operasional perpustakaan',
+                        subtitle: 'Pantau statistik utama, tambah koleksi, cek peminjaman, dan akses pengaturan QR dari satu portal admin.',
+                        action: TextButton.icon(
+                          onPressed: () => context.push('/admin-profile'),
+                          icon: const Icon(Icons.person_outline),
+                          label: const Text('Profil'),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       LibraryResponsiveGrid(
                         minTileWidth: 210,
                         children: [

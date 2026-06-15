@@ -5,7 +5,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/providers/api_providers.dart';
 import '../../../shared/widgets/library_chrome.dart';
-import 'widgets/admin_drawer.dart';
 
 class AdminQrScreen extends ConsumerWidget {
   const AdminQrScreen({super.key});
@@ -14,12 +13,8 @@ class AdminQrScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final booksState = ref.watch(booksProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Kode QR Buku', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-      ),
-      drawer: buildAdminDrawer(context),
-      body: booksState.when(
+    return LibraryAdminPage(
+      child: booksState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString(), style: const TextStyle(color: AppTheme.red))),
         data: (books) => ListView(

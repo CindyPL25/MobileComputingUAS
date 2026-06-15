@@ -5,7 +5,6 @@ import '../../../core/theme/app_theme.dart';
 import '../../../shared/models/app_models.dart';
 import '../../../shared/providers/api_providers.dart';
 import '../../../shared/widgets/library_chrome.dart';
-import 'widgets/admin_drawer.dart';
 
 class AdminUsersScreen extends ConsumerStatefulWidget {
   const AdminUsersScreen({super.key});
@@ -47,47 +46,69 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   Widget build(BuildContext context) {
     final usersState = ref.watch(adminUsersProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manajemen Pengguna', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-      ),
-      drawer: buildAdminDrawer(context),
-      body: usersState.when(
+    return LibraryAdminPage(
+      child: dashboardState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString(), style: const TextStyle(color: AppTheme.red))),
-        data: (users) => RefreshIndicator(
-          onRefresh: () async => ref.invalidate(adminUsersProvider),
-          child: ListView(
-            children: [
-              LibraryContent(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        data: (dashboard) => SingleChildScrollView(
+          child: LibraryContent(
+            maxWidth: 1040,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const LibrarySectionHeader(
+                  eyebrow: 'Portal Pengguna',
+                  title: 'Informasi akun mahasiswa dan admin',
+                  subtitle: 'Ringkasan akses pengguna yang terhubung ke backend PHP Native dan database MySQL.',
+                ),
+                const SizedBox(height: 18),
+                LibraryResponsiveGrid(
+                  minTileWidth: 220,
                   children: [
-                    const LibrarySurfaceCard(
-                      child: LibrarySectionHeader(
-                        eyebrow: 'Pengguna',
-                        title: 'Data Pengguna',
-                        subtitle: 'Kelola status dan role pengguna (mahasiswa).',
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text('Total user: ${users.length}', style: const TextStyle(color: AppTheme.ink, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 16),
-                    if (users.isEmpty)
-                      const LibrarySurfaceCard(child: Text('Belum ada pengguna terdaftar.', style: TextStyle(color: AppTheme.muted)))
-                    else
-                      LibraryResponsiveGrid(
-                        minTileWidth: 360,
-                        children: users.map((user) => _UserTile(
-                              user: user,
-                              onToggleStatus: () => _updateUserStatus(user, user.status == 'aktif' ? 'nonaktif' : 'aktif'),
-                              onToggleRole: () => _updateUserRole(user, user.role == 'mahasiswa' ? 'admin' : 'mahasiswa'),
-                            )).toList(),
-                      ),
+                    LibraryStatCard(label: 'Total Pengguna', value: dashboard.totalUsers.toString(), icon: Icons.people_alt_outlined, color: AppTheme.navy),
+                    const LibraryStatCard(label: 'Role Aktif', value: '2', icon: Icons.verified_user_outlined, color: AppTheme.gold),
+                    const LibraryStatCard(label: 'Sumber Data', value: 'MySQL', icon: Icons.storage_outlined, color: AppTheme.green),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 18),
+                LibraryResponsiveGrid(
+                  minTileWidth: 300,
+                  children: const [
+                    _UserInfoCard(
+                      icon: Icons.school_outlined,
+                      title: 'Mahasiswa',
+                      text: 'Akun mahasiswa dipakai untuk login aplikasi, melihat katalog, riwayat peminjaman, notifikasi, dan proses QR.',
+                    ),
+                    _UserInfoCard(
+                      icon: Icons.admin_panel_settings_outlined,
+                      title: 'Admin',
+                      text: 'Akun admin dipakai untuk mengelola koleksi, memantau peminjaman, mengakses kode QR, dan melihat ringkasan backend.',
+                    ),
+                    _UserInfoCard(
+                      icon: Icons.lock_outline,
+                      title: 'Validasi Role',
+                      text: 'Login mahasiswa dan admin sudah dipisah. Akun admin tidak bisa masuk lewat halaman mahasiswa, begitu juga sebaliknya.',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                const LibrarySurfaceCard(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(22),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Catatan pengelolaan', style: TextStyle(color: AppTheme.navy, fontSize: 18, fontWeight: FontWeight.w900)),
+                      SizedBox(height: 8),
+                      Text(
+                        'Portal Flutter menampilkan ringkasan pengguna dari API dashboard. Untuk CRUD user lengkap, gunakan website admin PHP Native karena endpoint mobile user-list belum tersedia.',
+                        style: TextStyle(color: AppTheme.muted, height: 1.45),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -95,68 +116,34 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   }
 }
 
-class _UserTile extends StatelessWidget {
-  const _UserTile({required this.user, required this.onToggleStatus, required this.onToggleRole});
+class _UserInfoCard extends StatelessWidget {
+  const _UserInfoCard({
+    required this.icon,
+    required this.title,
+    required this.text,
+  });
 
-  final UserModel user;
-  final VoidCallback onToggleStatus;
-  final VoidCallback onToggleRole;
+  final IconData icon;
+  final String title;
+  final String text;
 
   @override
   Widget build(BuildContext context) {
-    final isAktif = user.status == 'aktif';
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: AppTheme.surface, borderRadius: BorderRadius.circular(8), border: Border.all(color: AppTheme.line)),
+    return LibrarySurfaceCard(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(user.name, style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.navy, fontSize: 16)),
-                    Text(user.nim, style: const TextStyle(color: AppTheme.muted, fontSize: 12)),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isAktif ? AppTheme.gold.withValues(alpha: 0.1) : AppTheme.red.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(user.status.toUpperCase(), style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: isAktif ? AppTheme.gold : AppTheme.red)),
-              )
-            ],
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(color: AppTheme.creamStrong, borderRadius: BorderRadius.circular(8)),
+            child: Icon(icon, color: AppTheme.navy),
           ),
+          const SizedBox(height: 14),
+          Text(title, style: const TextStyle(color: AppTheme.navy, fontSize: 17, fontWeight: FontWeight.w900)),
           const SizedBox(height: 8),
-          Text(user.email, style: const TextStyle(color: AppTheme.ink, fontSize: 14)),
-          Text('Role: ${user.role.toUpperCase()}', style: const TextStyle(color: AppTheme.muted, fontSize: 12)),
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: AppTheme.line),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: onToggleStatus,
-                  child: Text(isAktif ? 'Nonaktifkan' : 'Aktifkan'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: onToggleRole,
-                  child: Text(user.role == 'mahasiswa' ? 'Jadikan Admin' : 'Jadikan Mahasiswa'),
-                ),
-              ),
-            ],
-          )
+          Text(text, style: const TextStyle(color: AppTheme.muted, height: 1.42)),
         ],
       ),
     );

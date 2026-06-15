@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../shared/providers/api_providers.dart';
 import '../../../shared/widgets/library_chrome.dart';
-import 'widgets/admin_drawer.dart';
 
 class AdminProfileScreen extends ConsumerWidget {
   const AdminProfileScreen({super.key});
@@ -14,12 +13,8 @@ class AdminProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final profileState = ref.watch(profileProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil Admin', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-      ),
-      drawer: buildAdminDrawer(context),
-      body: profileState.when(
+    return LibraryAdminPage(
+      child: profileState.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, _) => Center(child: Text(error.toString(), style: const TextStyle(color: AppTheme.red))),
         data: (user) => SingleChildScrollView(

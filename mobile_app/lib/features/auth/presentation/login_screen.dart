@@ -35,6 +35,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final user = await ref.read(authControllerProvider.notifier).login(identity, password);
+      if (user.role == 'admin') {
+        await ref.read(authControllerProvider.notifier).logout();
+        _showMessage('Akun admin harus masuk lewat halaman login admin.');
+        return;
+      }
       ref
         ..invalidate(profileProvider)
         ..invalidate(dashboardProvider)

@@ -157,7 +157,7 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
               selectedIndex: mahasiswaCurrentIndex,
               onDestinationSelected: _onMahasiswaItemTapped,
               extended: true,
-              minExtendedWidth: 188,
+              minExtendedWidth: 206,
               leading: const Padding(
                 padding: EdgeInsets.fromLTRB(12, 16, 12, 28),
                 child: Row(
@@ -165,7 +165,7 @@ class _MainWrapperState extends ConsumerState<MainWrapper> {
                   children: [
                     _RailLogo(),
                     SizedBox(width: 10),
-                    Text('E-Library', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+                    Text('Menu Mahasiswa', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
                   ],
                 ),
               ),
